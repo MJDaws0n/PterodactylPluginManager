@@ -15,3 +15,5 @@ Add this code to ./pterodactly/public/index.php just bellow define('LARAVEL_STAR
 */
 require __DIR__ . '/../PterodactylPluginManager/connector.php';
 ```
+
+# Wrong account
