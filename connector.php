@@ -1,9 +1,9 @@
 <?php
-
 if (!isset($_GET['get'])){
     $currentUrl = $_SERVER['REQUEST_URI'];
 
     // Get configuration
+    global $settings;
     $settings = [];
     $settings['copyright'] = "Does not exist";
     if (file_exists(dirname(__FILE__) . '/adminSettings.json')) {
@@ -21,15 +21,15 @@ if (!isset($_GET['get'])){
             $base64_content = base64_encode($file_content);
             $mime_type = mime_content_type($file_path);
             $data_url = 'data:' . $mime_type . ';base64,' . $base64_content;
-            echo "<script>const copyrightText = ".str_replace('{year}', date("Y"), json_encode($settings['copyright']))."</script>";
             echo "<script src=\"$data_url\"></script>";
         } else {
             echo "Error: Admin file missing. $file_path";
         }
     }
 
-    function test($t){
-        return'left';
+    // On all non API pages
+    if(explode('/', $currentUrl)[1] != 'api'){
+        include(dirname(__FILE__).'/pages.php');
     }
 
     // On the custom admin pages
@@ -40,7 +40,7 @@ if (!isset($_GET['get'])){
         ){
             // On the general page
             if(explode('/', $currentUrl)[3] == 'general'){
-            include(dirname(__FILE__).'/adminGeneral.php');
+                include(dirname(__FILE__).'/adminGeneral.php');
             }
             exit();
         }
