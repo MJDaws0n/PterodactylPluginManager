@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', ()=>{
+    changeFooter();
+});
+
+window.addEventListener('popstate', function(event) {
+    console.log('here');
+    changeFooter();
+});
+  
+
+function changeFooter(){
     if(typeof onAdminPage !== 'undefined' && onAdminPage){
         const footer = document.querySelector('.main-footer');
 
@@ -13,12 +23,21 @@ document.addEventListener('DOMContentLoaded', ()=>{
         waitForElement('.PageContentBlock___StyledP-sc-kbxq2g-3.dcHyfd', function(element) {
             const footer = document.querySelector('.PageContentBlock___StyledP-sc-kbxq2g-3.dcHyfd');
             footer.innerHTML = copyrightText;    // Not += because we want to completely remove what's already there
-
-            console.log('Done');
         });
     }
-});
+}
 
+{
+    var i = 0;
+    document.querySelector('.fade-enter-done').children[0].children.forEach((child), ()=>{
+        if(i != 0){
+            child.addEventListener('click', function(){
+                changeFooter();
+            })
+        }
+        i++;
+    })
+}
 
 // Function to wait for an element to appear
 function waitForElement(selector, callback) {

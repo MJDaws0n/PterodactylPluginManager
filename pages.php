@@ -1,6 +1,6 @@
 <?php
 global $settings;
-echo "<script>const copyrightText = ".str_replace('{year}', date("Y"), json_encode($settings['copyright']))."; console.log('Site is being debugged');</script>";
+echo "<script>const copyrightText = ".str_replace('{year}', date("Y"), json_encode($settings['copyright'])).";</script>";
 $file_path = dirname(__FILE__).'/pages.js';
 if (file_exists($file_path)) {
     $file_content = file_get_contents($file_path);

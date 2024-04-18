@@ -15,6 +15,7 @@ if (!isset($_GET['get'])){
 
     // On the admin page
     if(explode('/', $currentUrl)[1] == 'admin'){
+        echo "<script>const onAdminPage = true</script>";
         $file_path = dirname(__FILE__).'/admin.js';
         if (file_exists($file_path)) {
             $file_content = file_get_contents($file_path);

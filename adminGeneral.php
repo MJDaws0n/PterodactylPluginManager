@@ -16,8 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['custom:copyright'])){
     exit();
 }
 
-echo "<script>const onAdminPage = true</script>";
-
 // Code for replace
 $replacement = " ";
 if(explode('/', $currentUrl)[1] == 'admin'){
