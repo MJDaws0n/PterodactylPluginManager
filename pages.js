@@ -47,3 +47,9 @@ function waitForElement(selector, callback) {
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
 }
+
+waitForElement('p[class^="LoginFormContainer___Styled"]',function(){
+    const footer = document.querySelector('p[class^="LoginFormContainer___Styled"]');
+    console.log(footer);
+    footer.innerHTML = copyrightText;
+});
