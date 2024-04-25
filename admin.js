@@ -23,4 +23,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
     sidebar.append(pluginSettings);
   
     document.dispatchEvent(new Event('sideBarLoaded'));
+  
+    if (window.location.pathname.startsWith('/admin')) {
+        var regex = /\/admin[\/?]+$/g;
+        if (regex.test(window.location.pathname+'/')){
+            const newInfo = document.createElement('div');
+            document.querySelector('.content').children[1].querySelector('[class^="col-xs-"] .box-body').append(newInfo);
+            newInfo.innerHTML = 'You are running PterodactylPluginManager version <code>'+addonVersion+'</code>.';
+            if(upToDate){
+                newInfo.innerHTML += 'Your addon is up to date!';
+            } else{
+                newInfo.innerHTML += 'Your addon is not up to date!';
+            }
+        }
+    }
 })
