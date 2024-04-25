@@ -16,118 +16,127 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['custom:copyright'])){
     exit();
 }
 
-// Code for replace
-$replacement = " ";
-if(explode('/', $currentUrl)[1] == 'admin'){
-    $file_path = dirname(__FILE__).'/admin.js';
-    if (file_exists($file_path)) {
-        $file_content = file_get_contents($file_path);
-        $base64_content = base64_encode($file_content);
-        $mime_type = mime_content_type($file_path);
-        $data_url = 'data:' . $mime_type . ';base64,' . $base64_content;
-        $replacement = "<script src=\"$data_url\"></script>";
-    } else {
-        echo "Error: Admin file missing. $file_path";
+if($_SERVER['REQUEST_METHOD'] === 'GET'){
+    // Code for replace
+    $replacement = " ";
+    if(explode('/', $currentUrl)[1] == 'admin'){
+        $file_path = dirname(__FILE__).'/admin.js';
+        if (file_exists($file_path)) {
+            $file_content = file_get_contents($file_path);
+            $base64_content = base64_encode($file_content);
+            $mime_type = mime_content_type($file_path);
+            $data_url = 'data:' . $mime_type . ';base64,' . $base64_content;
+            $replacement = "<script src=\"$data_url\"></script>";
+        } else {
+            echo "Error: Admin file missing. $file_path";
+        }
     }
-}
 
-// Get the current domain of the website
-$currentDomain = $_SERVER['HTTP_HOST'];
+    // Check if we are on the admin overview page
+    if(explode('/', $currentUrl)[1] == 'admin'){
+        global $config;
+        echo "<script>const addonVersion = 'v{$config['version']}';</script>";
+    }
 
-// Set the URL to ping
-$url = "https://$currentDomain/admin/settings?get=true";
+    // Get the current domain of the website
+    $currentDomain = $_SERVER['HTTP_HOST'];
 
-// Get all cookies that the current user has
-$cookies = "";
-foreach ($_COOKIE as $name => $value) {
-    $cookies .= $name . '=' . $value . '; ';
-}
+    // Set the URL to ping
+    $url = "https://$currentDomain/admin/settings?get=true";
 
-// Initialize cURL session
-$ch = curl_init();
+    // Get all cookies that the current user has
+    $cookies = "";
+    foreach ($_COOKIE as $name => $value) {
+        $cookies .= $name . '=' . $value . '; ';
+    }
 
-// Set cURL options
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_COOKIE, $cookies);
+    // Initialize cURL session
+    $ch = curl_init();
 
-// Execute cURL request
-$response = curl_exec($ch);
+    // Set cURL options
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_COOKIE, $cookies);
 
-// Check for errors
-if ($response === false) {
-    echo 'Error: ' . curl_error($ch);
-} else {
-    // Save the response to a variable
-    $pingResponse = $response;
-    
-    // Output the response
-    echo str_replace($replacement, '', $pingResponse);
-}
+    // Execute cURL request
+    $response = curl_exec($ch);
 
-curl_close($ch);
+    // Check for errors
+    if ($response === false) {
+        echo 'Error: ' . curl_error($ch);
+    } else {
+        // Save the response to a variable
+        $pingResponse = $response;
+        
+        // Output the response
+        echo str_replace($replacement, '', $pingResponse);
+    }
 
-$jsonFile = dirname(__FILE__) . '/adminSettings.json';
+    curl_close($ch);
 
-// Check if the file exists
-if (file_exists($jsonFile)) {
-    $jsonContent = file_get_contents($jsonFile);
-    $settingsObject = json_decode($jsonContent, true);
-} else {
-    echo "File not found: $jsonFile";
-}
-?>
+    $jsonFile = dirname(__FILE__) . '/adminSettings.json';
 
-<script>
-    document.addEventListener('sideBarLoaded', function(event) {
-        var spanElements = document.querySelectorAll('span');
+    // Check if the file exists
+    if (file_exists($jsonFile)) {
+        $jsonContent = file_get_contents($jsonFile);
+        $settingsObject = json_decode($jsonContent, true);
+    } else {
+        echo "File not found: $jsonFile";
+    }
+    ?>
 
-        spanElements.forEach(function(spanElement) {
-        if (spanElement.textContent.trim() == "General Settings") {
-            spanElement.parentElement.parentElement.classList.add('active');
-            spanElement.parentElement.parentElement.classList.remove('1');
-        }
-        if (spanElement.textContent.trim() == "Settings") {
-            spanElement.parentElement.parentElement.classList.add('1');
-            spanElement.parentElement.parentElement.classList.remove('active');
-        }
+    <script>
+        document.addEventListener('sideBarLoaded', function(event) {
+            var spanElements = document.querySelectorAll('span');
+
+            spanElements.forEach(function(spanElement) {
+            if (spanElement.textContent.trim() == "General Settings") {
+                spanElement.parentElement.parentElement.classList.add('active');
+                spanElement.parentElement.parentElement.classList.remove('1');
+            }
+            if (spanElement.textContent.trim() == "Settings") {
+                spanElement.parentElement.parentElement.classList.add('1');
+                spanElement.parentElement.parentElement.classList.remove('active');
+            }
+        });
+        
+        var title = document.querySelector('.content-wrapper .content-header h1');
+        title.innerHTML = `Pterodactyl Custom Options<small>Condifgure Pterodactyl to your (actual) liking.</small>`;
+        
+        var directory = document.querySelector('.content-wrapper .breadcrumb li');
+        directory.innerHTML = `<a href="/admin">Admin  >  Custom</a>`;
+        var directory2 = document.querySelector('.content-wrapper .breadcrumb li.active');
+        directory2.textContent = `Settings`;
+        
+        // Tabs
+        var tabs = document.querySelector('.content-wrapper .nav-tabs-custom.nav-tabs-floating .nav.nav-tabs');
+        Array.from(tabs.children).forEach((tab)=>{
+            if(tab.firstChild.textContent == 'Mail' || tab.firstChild.textContent == 'Advanced'){
+                tab.remove();
+            }
+        });
+        
+        // Settings
+        // Remove other options
+        var settingsOptions = document.querySelectorAll('.content-wrapper .content .box-body .form-group.col-md-4');
+        var i = 0;
+        
+        settingsOptions.forEach((option)=>{
+            if(i == 0){
+                option.firstElementChild.textContent = 'Copyright Text';
+                option.children[1].children[0].name = 'custom:copyright'
+                option.children[1].children[0].value = <?php echo json_encode($settingsObject['copyright']);?>;
+                option.children[1].children[1].children[0].textContent = 'The Copyright to display on all of the pages on the panel and on the footer of the emails pterodactyl sends.';
+            } else{
+                option.remove();
+            }
+            i++;
+        });
+        
+        // Make the saving work
+        var settingsOptions = document.querySelector('.content-wrapper .content .col-xs-12 .box form');
+        settingsOptions.action = '/admin/custom/general';
     });
-    
-    var title = document.querySelector('.content-wrapper .content-header h1');
-    title.innerHTML = `Pterodactyl Custom Options<small>Condifgure Pterodactyl to your (actual) liking.</small>`;
-    
-    var directory = document.querySelector('.content-wrapper .breadcrumb li');
-    directory.innerHTML = `<a href="/admin">Admin  >  Custom</a>`;
-    var directory2 = document.querySelector('.content-wrapper .breadcrumb li.active');
-    directory2.textContent = `Settings`;
-    
-    // Tabs
-    var tabs = document.querySelector('.content-wrapper .nav-tabs-custom.nav-tabs-floating .nav.nav-tabs');
-    Array.from(tabs.children).forEach((tab)=>{
-        if(tab.firstChild.textContent == 'Mail' || tab.firstChild.textContent == 'Advanced'){
-            tab.remove();
-        }
-    });
-    
-    // Settings
-    // Remove other options
-    var settingsOptions = document.querySelectorAll('.content-wrapper .content .box-body .form-group.col-md-4');
-    var i = 0;
-    
-    settingsOptions.forEach((option)=>{
-        if(i == 0){
-            option.firstElementChild.textContent = 'Copyright Text';
-            option.children[1].children[0].name = 'custom:copyright'
-            option.children[1].children[0].value = <?php echo json_encode($settingsObject['copyright']);?>;
-            option.children[1].children[1].children[0].textContent = 'The Copyright to display on all of the pages on the panel and on the footer of the emails pterodactyl sends.';
-        } else{
-            option.remove();
-        }
-        i++;
-    });
-    
-    // Make the saving work
-    var settingsOptions = document.querySelector('.content-wrapper .content .col-xs-12 .box form');
-    settingsOptions.action = '/admin/custom/general';
-});
-</script>
+    </script>
+<?php
+}
