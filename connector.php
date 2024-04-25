@@ -1,5 +1,26 @@
 <?php
-if (!isset($_GET['get'])){
+error_reporting(E_ALL);
+$url = 'https://github.com/MJDaws0n/PterodactylPluginManager/releases/download/latest/default.version';
+$contents = file_get_contents($url);
+
+if ($contents !== false) {
+    $latestVersion = substr_replace($contents ,"", -1);
+}
+
+$version = 'v1.0.0-pre';
+
+$upToDate = 'false';
+if($version == $latestVersion){
+    $upToDate = 'true';
+}
+
+global $config;
+$config = [
+    'version' => $version,
+    'latest' => $latestVersion,
+    'upToDate' => $upToDate
+];
+if (!isset($_GET['get']) && $_SERVER['REQUEST_URI'] != '/sanctum/csrf-cookie'){
     $currentUrl = $_SERVER['REQUEST_URI'];
 
     // Get configuration
@@ -16,6 +37,8 @@ if (!isset($_GET['get'])){
     // On the admin page
     if(explode('/', $currentUrl)[1] == 'admin'){
         echo "<script>const onAdminPage = true</script>";
+        echo "<script>const addonVersion = '{$config['version']}'</script>";
+        echo "<script>const upToDate = {$config['upToDate']}</script>";
         $file_path = dirname(__FILE__).'/admin.js';
         if (file_exists($file_path)) {
             $file_content = file_get_contents($file_path);
