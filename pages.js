@@ -24,7 +24,6 @@ if(typeof onAdminPage !== 'undefined' && onAdminPage){
             mutation.addedNodes.forEach((node) => {
                 if (node.nodeType === 1 && document.querySelector('#app').contains(node.parentNode)) {
                     if(document.querySelector('[class^="ContentContainer-"][class*=" PageContentBlock___StyledContentContainer"] [class^="PageContentBlock___Styled"] a[class^="PageContentBlock___Styled"]')){
-                        console.log('Change');
                         changeFooter(observer);
                     }
                 }
@@ -33,6 +32,29 @@ if(typeof onAdminPage !== 'undefined' && onAdminPage){
         });
     });
     
+    waitForElement('#app',function(){observer.observe(document.documentElement,{childList:true,subtree:true});});
+}
+if(window.location.pathname.startsWith('/auth') || window.location.pathname.startsWith('/')){
+    waitForElement('p[class^="LoginFormContainer___Styled"]',function(){
+        const footer = document.querySelector('p[class^="LoginFormContainer___Styled"]');
+        footer.innerHTML = copyrightText;
+    });
+
+    const observer = new MutationObserver((mutationsList) => {
+        mutationsList.forEach((mutation) => {
+        if (mutation.addedNodes.length) {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1 && document.querySelector('#app').contains(node.parentNode)) {
+                    if(document.querySelector('p[class^="LoginFormContainer___Styled"] a[class^="LoginFormContainer___Styled"]')){
+                        const footer = document.querySelector('p[class^="LoginFormContainer___Styled"]');
+                        footer.innerHTML = copyrightText;
+                    }
+                }
+            });
+        }
+        });
+    });
+
     waitForElement('#app',function(){observer.observe(document.documentElement,{childList:true,subtree:true});});
 }
 
@@ -47,9 +69,3 @@ function waitForElement(selector, callback) {
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
 }
-
-waitForElement('p[class^="LoginFormContainer___Styled"]',function(){
-    const footer = document.querySelector('p[class^="LoginFormContainer___Styled"]');
-    console.log(footer);
-    footer.innerHTML = copyrightText;
-});
