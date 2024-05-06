@@ -9,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['custom:copyright'])){
     }
   
     $settingsObject['copyright'] = $newCopy;
-    print_r($settingsObject);
     chmod($file, 0666);
     file_put_contents($jsonFile, json_encode($settingsObject));
     header('location: /admin/custom/general');

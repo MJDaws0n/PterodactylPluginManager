@@ -1,12 +1,12 @@
 <?php
-error_reporting(E_ALL);
-$url = 'https://github.com/MJDaws0n/PterodactylPluginManager/releases/download/latest/default.version';
-$contents = file_get_contents($url);
+// Need to make this not lag later somehow
+// $url = 'https://github.com/MJDaws0n/PterodactylPluginManager/releases/download/latest/default.version';
+// $contents = file_get_contents($url);
 
-if ($contents !== false) {
-    $latestVersion = substr_replace($contents ,"", -1);
-}
-
+// if ($contents !== false) {
+//     $latestVersion = substr_replace($contents ,"", -1);
+// }
+$latestVersion = 'v1.0.0-pre';
 $version = 'v1.0.0-pre';
 
 $upToDate = 'false';
@@ -65,6 +65,10 @@ if (!isset($_GET['get']) && $_SERVER['REQUEST_URI'] != '/sanctum/csrf-cookie'){
             // On the general page
             if(explode('/', $currentUrl)[3] == 'general'){
                 include(dirname(__FILE__).'/adminGeneral.php');
+            }
+            // On the Themes page
+            if(explode('/', $currentUrl)[3] == 'themes'){
+                include(dirname(__FILE__).'/adminThemes.php');
             }
             exit();
         }

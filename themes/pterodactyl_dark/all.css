@@ -1,0 +1,231 @@
+#app .mx-auto.w-full.flex.items-center,
+#app .w-full.bg-neutral-900.shadow-md.overflow-x-auto{
+  background-color: #141414;
+}
+#app #logo.flex-1 a{
+  color: #ffffff;
+}
+#app #logo.flex-1 a:hover{
+  color: #F3F3F3;
+}
+#app [class*="NavigationBar__RightNavigation-sc-"].flex.h-full.items-center.justify-center a.active,
+#app [class*="NavigationBar__RightNavigation-sc-"].flex.h-full.items-center.justify-center a:hover,
+#app [class*="NavigationBar__RightNavigation-sc-"].flex.h-full.items-center.justify-center div:hover,
+#app [class*="NavigationBar__RightNavigation-sc-"].flex.h-full.items-center.justify-center button:hover{
+  box-shadow: #E1E1E1 0px -2px inset;
+}
+#app, html, body{
+  background-color: #1B1B1B !important;
+}
+body div[class*="Modal___StyledDiv2-sc-"]{
+  background-color: #1B1B1B;
+}
+body div[class*="Modal___StyledDiv2-sc-"] form input{
+  background-color: #1B1B1B !important;
+}
+body div[class*="Modal___StyledDiv2-sc-"] a[class*="SearchModal__ServerResult-sc-"]{
+  background-color: #1B1B1B;
+}
+
+
+
+
+body.home_page #app [class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:not(:first-child){
+  background-color: #2b2b2b;
+}
+body.home_page #app [class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:not(:first-child) > *:nth-child(1) > *:nth-child(2) > *:nth-child(1){
+  color: #ffffff;
+  font-weight: 500;
+}
+body.home_page #app [class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:not(:first-child) > *:nth-child(1) > *:nth-child(2) > *:nth-child(2){
+  color: #b6b6b6;
+  font-weight: 500;
+}
+body.home_page #app [class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:not(:first-child) > *:nth-child(1) > *:nth-child(1).icon{
+  background-color: rgb(155, 155, 155);
+}
+body.home_page #app [class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:not(:first-child) > *:nth-child(1) > *:nth-child(1) > *:nth-child(1){
+  color: #424242;
+}
+body.home_page #app [class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:not(:first-child) > *:nth-child(2) > *:nth-child(1) > *:nth-child(2){
+  color: #b6b6b6;
+  font-weight: 500;
+}
+body.home_page #app [class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:not(:first-child) > *:nth-child(3) > * > *:nth-child(2){
+  color: #b6b6b6;
+  font-weight: 500;
+}
+body.home_page #app [class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:not(:first-child) > *:nth-child(3) > * > *:nth-child(1) > *:nth-child(2){
+  color: #b6b6b6;
+  font-weight: 500;
+}
+body.home_page #app [class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:nth-child(1) > *:nth-child(1){
+  color: white;
+}
+body.home_page #app [class*="PageContentBlock___StyledP-sc-"]{
+  color: white;
+}
+
+
+
+
+body.server_page #app .grid.grid-cols-4.gap-2{
+  background-color: #1B1B1B;
+}
+body.server_page #app [class*="Fade__Container-sc-"]{
+  background-color: #1B1B1B;
+}
+body.server_page #app [class*=SubNavigation-sc-]{
+  background-color: #1B1B1B;
+  box-shadow: none;
+}
+
+
+body.server_page.server_files #app [class*=ContentContainer-sc-][class*=PageContentBlock___StyledContentContainer-sc-] > *:nth-child(2) > *{
+  background-color: #2b2b2b;
+}
+body.server_page.server_files #app [class*=ContentContainer-sc-][class*=PageContentBlock___StyledContentContainer-sc-] > *:nth-child(2) > * > *:nth-child(2) > *:nth-child(2){
+  color: hsla(210%, 16%, 82%);
+  font-weight: 500;
+}
+body.server_page.server_files #app [class*=ContentContainer-sc-][class*=PageContentBlock___StyledContentContainer-sc-] > *:nth-child(2) > * > *:nth-child(2) > *:nth-child(1) > *:nth-child(1){
+  color: hsla(210%, 16%, 82%);
+}
+body.server_page.server_files.server_files_edit #app [class*="App___StyledDiv-sc-"] [class*="Fade__Container-sc-"] section > div:nth-child(1) > div:nth-child(2) > div:nth-child(2) > div:nth-child(2) {
+  background-color: #2b2b2b;
+}
+body.server_page.server_files.server_files_edit #app [class*="App___StyledDiv-sc-"] [class*="Fade__Container-sc-"] section > div:nth-child(1) > div:nth-child(2) > div:nth-child(2) > div:nth-child(2) > div:nth-child(6) > div:nth-child(3) {
+  background-color: #2b2b2b;
+}
+body.server_page.server_files.server_files_edit #app [class*="App___StyledDiv-sc-"] .CodeMirror-linenumber {
+  color: rgb(187, 187, 187);
+}
+body.server_page.server_files.server_files_edit #app [class*="App___StyledDiv-sc-"]  > * button{
+  border: rgb(141, 141, 141) solid 1px;
+  background-color: #00000000;
+}
+body.server_page.server_files.server_files_edit #app [class*="App___StyledDiv-sc-"]  > * select{
+  border: rgb(141, 141, 141) solid 1px;
+  background-color: #00000000;
+}
+body.server_page.server_files.server_files_edit #app [class*="App___StyledDiv-sc-"]  > * div[class*="FileEditContainer___StyledDiv5-sc-"]{
+  border: rgb(141, 141, 141) solid 1px;
+  background-color: #00000000;
+}
+body.server_page.server_files.server_files_edit #app [class*="App___StyledDiv-sc-"]  > * select option{
+  background-color: #2b2b2b;
+}
+body.server_page.server_files.server_files_edit #app [class*="App___StyledDiv-sc-"]  > * select::-webkit-scrollbar{
+  background: #2b2b2b; 
+}
+
+
+
+body.server_page.server_console #app div.grid.grid-cols-4.gap-2.mb-4 div.grid.grid-cols-6.gap-2.col-span-4.order-last > *{
+  background-color: #2b2b2b;
+}
+body.server_page.server_console #app div[class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > *:nth-child(3) > *{
+  background-color: #2b2b2b;
+}
+
+
+body.server_page.server_network #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div[class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > div[class*="GreyRowBox-sc-"]{
+  background-color: #2b2b2b;
+}
+body.server_page.server_network #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div[class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > div[class*="GreyRowBox-sc-"]
+> div:nth-child(1) > div:nth-child(2) > code:nth-child(1){
+  background-color: #3d3d3d;
+}
+body.server_page.server_network #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div[class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > div[class*="GreyRowBox-sc-"]
+> div:nth-child(1) > div:nth-child(3) > code:nth-child(1){
+  background-color: #3d3d3d;
+}
+body.server_page.server_network #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div[class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > div[class*="GreyRowBox-sc-"]
+> div:nth-child(2) > div:nth-child(1) > textarea{
+  background-color: #3d3d3d;
+}
+
+
+body.server_page.server_activity #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div{
+  background-color: #1B1B1B;
+  border: none;
+}
+
+
+body.server_page.server_startup #app div[class*="Fade__Container-sc-"] > section:nth-child(1)> div:nth-child(1) div[class*="StartupContainer___StyledDiv-sc-"] div{
+  background-color: #2b2b2b;
+}
+body.server_page.server_startup #app div[class*="Fade__Container-sc-"] > section:nth-child(1)> div:nth-child(1) div[class*="StartupContainer___StyledDiv-sc-"] div div:nth-child(2) > div:nth-child(1) > p:nth-child(1){
+  background-color: #2b2b2b;
+}
+body.server_page.server_startup #app div[class*="Fade__Container-sc-"] > section:nth-child(1)> div:nth-child(1) div[class*="StartupContainer___StyledDiv-sc-"] div input{
+  background-color: #2b2b2b;
+}
+body.server_page.server_startup #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div:nth-child(1) div:nth-child(3) div{
+  background-color: #2b2b2b;
+}
+body.server_page.server_startup #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div:nth-child(1) div:nth-child(3) div input{
+  background-color: #2b2b2b;
+}
+body.server_page.server_startup #app div[class*="Fade__Container-sc-"] > section:nth-child(1)> div:nth-child(1) div[class*="StartupContainer___StyledDiv-sc-"] div select{
+  background-color: #2b2b2b;
+}
+
+
+body.server_page.server_settings #app [class*="App___StyledDiv-sc"] > div:nth-child(3) section > div:nth-child(1) div div > *{
+  background-color: #2b2b2b;
+}
+body.server_page.server_settings #app [class*="App___StyledDiv-sc"] > div:nth-child(3) section > div:nth-child(1) div div > * button{
+  border: rgb(141, 141, 141) solid 1px;
+}
+
+
+body.account_page #app > div:nth-child(2) > div:nth-child(2){
+  background-color: #1B1B1B;
+  box-shadow: none;
+}
+body.account_page.account_account #app > div:nth-child(2) > div:nth-child(3) section div:nth-child(1) div div > *,
+body.account_page.account_api #app > div:nth-child(2) > div:nth-child(3) section div:nth-child(1) div div > *,
+body.account_page.account_ssh #app > div:nth-child(2) > div:nth-child(3) section div:nth-child(1) div div > *{
+  background-color: #2b2b2b;
+}
+body.account_page #app > div:nth-child(2) > div:nth-child(3) section div:nth-child(1) div div > h2{
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  margin-bottom: 0;
+  padding-top: 16px;
+}
+body.account_page #app > div:nth-child(2) > div:nth-child(3) section div:nth-child(1) div div > div{
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  margin-top: 0;
+}
+body.account_page #app > div:nth-child(2) > div:nth-child(3) section div:nth-child(1) div div button{
+  border: rgb(141, 141, 141) solid 1px;
+}
+body.account_page.account_activity #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div{
+  background-color: #1B1B1B;
+  border: none;
+}
+body.account_page.account_activity #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div svg{
+  background-color: #1B1B1B;
+}
+
+/* Popups */
+body #headlessui-portal-root div.flex{
+  background-color: #2b2b2b;
+}
+body #headlessui-portal-root div.flex input{
+  background-color: #3d3d3d;
+}
+body #headlessui-portal-root div.flex code{
+  background-color: #3d3d3d;
+}
+body #headlessui-portal-root div button{
+  background-color: #3d3d3d;
+}
+
+
+body #app button[class*="style-module_"]{
+  background-color: #3d3d3d;
+}

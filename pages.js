@@ -34,6 +34,8 @@ if(typeof onAdminPage !== 'undefined' && onAdminPage){
     
     waitForElement('#app',function(){observer.observe(document.documentElement,{childList:true,subtree:true});});
 }
+
+const pageChangedEvent = new Event('pageChanged');
 if(window.location.pathname.startsWith('/auth') || window.location.pathname.startsWith('/')){
     waitForElement('p[class^="LoginFormContainer___Styled"]',function(){
         const footer = document.querySelector('p[class^="LoginFormContainer___Styled"]');
@@ -43,6 +45,7 @@ if(window.location.pathname.startsWith('/auth') || window.location.pathname.star
     const observer = new MutationObserver((mutationsList) => {
         mutationsList.forEach((mutation) => {
         if (mutation.addedNodes.length) {
+            document.dispatchEvent(pageChangedEvent);
             mutation.addedNodes.forEach((node) => {
                 if (node.nodeType === 1 && document.querySelector('#app').contains(node.parentNode)) {
                     if(document.querySelector('p[class^="LoginFormContainer___Styled"] a[class^="LoginFormContainer___Styled"]')){
