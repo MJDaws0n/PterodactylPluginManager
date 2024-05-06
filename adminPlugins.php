@@ -1,17 +1,28 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['custom:theme'])){
-    $theme = $_POST['custom:theme'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['custom:plugin'])){
+    $selectedPlugin = $_POST['custom:plugin'];
 
     $jsonFile = dirname(__FILE__) . '/adminSettings.json';
     if (file_exists($jsonFile)) {
         $jsonContent = file_get_contents($jsonFile);
         $settingsObject = json_decode($jsonContent, true);
     }
-  
-    $settingsObject['theme'] = $theme;
+
+    $found = false;
+    foreach ($settingsObject['plugins'] as $key => $plugin) {
+        if ($plugin == $selectedPlugin) {
+            unset($settingsObject['plugins'][$key]);
+            $found = true;
+        }
+    }
+
+    if(!$found){
+        array_push($settingsObject['plugins'], $selectedPlugin);
+    }
+    
     chmod($file, 0666);
     file_put_contents($jsonFile, json_encode($settingsObject));
-    header('location: /admin/custom/themes');
+    header('location: /admin/custom/plugins');
     exit();
 }
 
@@ -89,7 +100,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
             var spanElements = document.querySelectorAll('span');
 
             spanElements.forEach(function(spanElement) {
-            if (spanElement.textContent.trim() == "Themes") {
+            if (spanElement.textContent.trim() == "Plugins") {
                 spanElement.parentElement.parentElement.classList.add('active');
                 spanElement.parentElement.parentElement.classList.remove('1');
             }
@@ -105,7 +116,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
         var directory = document.querySelector('.content-wrapper .breadcrumb li');
         directory.innerHTML = `<a href="/admin">Admin  >  Custom</a>`;
         var directory2 = document.querySelector('.content-wrapper .breadcrumb li.active');
-        directory2.textContent = `Themes`;
+        directory2.textContent = `Plugins`;
         
         // Tabs
         var tabs = document.querySelector('.content-wrapper .nav-tabs-custom.nav-tabs-floating .nav.nav-tabs');
@@ -120,11 +131,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
             option.remove();
         });
 
-        // Add a theme
-        function addTheme(name, id, description, author, url, last_update){
+        // Add a plugin
+        function addPlugin(name, id, description, author, url, last_update, enabled){
             const theme = document.createElement('div');
             theme.classList.add('row');
-            theme.setAttribute('data-theme', id);
+            theme.setAttribute('data-plugin', id);
             theme.classList.add('col-md-4');
             theme.classList.add('form-group');
             
@@ -151,8 +162,8 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
             installButton.textContent = 'Enable';
 
             // Check current theme
-            if(id == <?php echo json_encode($settingsObject['theme']);?>){
-                installButton.textContent = 'Enabled';
+            if(enabled){
+                installButton.textContent = 'Disable';
             }
             
             
@@ -171,7 +182,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
 
                 const idInput = document.createElement('input');
                 idInput.type = 'hidden';
-                idInput.name = 'custom:theme';
+                idInput.name = 'custom:plugin';
                 idInput.value = id;
 
                 form.appendChild(themeInput);
@@ -192,9 +203,9 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
         }
 
         <?php
-        foreach (scandir(dirname(__FILE__) . '/themes/') as $folder){
-            if ($folder != '.' && $folder != '..' && is_dir(dirname(__FILE__) . '/themes/' . $folder)) {
-                $configFile = dirname(__FILE__) . '/themes/'.$folder.'/main.ptero';
+        foreach (scandir(dirname(__FILE__) . '/plugins/') as $folder){
+            if ($folder != '.' && $folder != '..' && is_dir(dirname(__FILE__) . '/plugins/' . $folder)) {
+                $configFile = dirname(__FILE__) . '/plugins/'.$folder.'/main.ptero';
                 
                 if(file_exists($configFile) && json_decode(file_get_contents($configFile)) !== null){
                     $themeConfig = json_decode(file_get_contents($configFile), true);
@@ -204,10 +215,19 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
                     $author = isset($themeConfig['author']) ? json_encode($themeConfig['author']) : 'null';
                     $url = isset($themeConfig['url']) ? json_encode($themeConfig['url']) : 'null';
                     $last_updated = isset($themeConfig['last_updated']) ? json_encode($themeConfig['last_updated']) : 'null';
+                    
+                    $pluginActive = 'false';
+                    
+                    // Check if plugin is enabled
+                    foreach ($settingsObject['plugins'] as $plugin) {
+                        if($plugin == $folder){
+                            $pluginActive = 'true';
+                        }
+                    }
 
                     $themeID = json_encode($folder);
                     ?>
-                    addTheme(<?php echo $name;?>, <?php echo $themeID;?>, <?php echo $description;?>, <?php echo $author;?>, <?php echo $url;?>, <?php echo $last_updated;?>);
+                    addPlugin(<?php echo $name;?>, <?php echo $themeID;?>, <?php echo $description;?>, <?php echo $author;?>, <?php echo $url;?>, <?php echo $last_updated;?>, <?php echo $pluginActive;?>);
                     <?php
                 }
             }
@@ -216,14 +236,14 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
         
         // Make the saving work
         var settingsOptions = document.querySelector('.content-wrapper .content .col-xs-12 .box form');
-        settingsOptions.action = '/admin/custom/themes';
+        settingsOptions.action = '/admin/custom/plugins';
 
 
         // Remove save button
         document.querySelector('.content-wrapper .content .col-xs-12 .box form .box-footer button').remove();
 
         // Change the title
-        $('h3.box-title').text('Themes');
+        $('h3.box-title').text('Plugins');
     });
 
     function escapeHTML(html) {

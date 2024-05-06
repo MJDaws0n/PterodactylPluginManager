@@ -1,4 +1,5 @@
 {
   "copyright": "Copyright &copy; 2022 - {year} <a href=\"https://webworkshub.online/\">WebWorks</a>.",
-  "theme": "testing"
+  "theme": "default",
+  "plugins": []
 }

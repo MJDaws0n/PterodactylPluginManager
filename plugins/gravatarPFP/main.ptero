@@ -1,0 +1,8 @@
+{
+    "name": "Gravitar PFP",
+    "description": "Shows the users gravitar PFP on the frontend. (As it does on the backend).",
+    "author": "MJDawson",
+    "url": "https://mjdawson.net",
+    "last_updated": "06/05/2023",
+    "execute": "/main.php"
+}

@@ -20,19 +20,20 @@ $config = [
     'latest' => $latestVersion,
     'upToDate' => $upToDate
 ];
+
+// Get configuration
+global $settings;
+$settings = [];
+$settings['copyright'] = "Does not exist";
+if (file_exists(dirname(__FILE__) . '/adminSettings.json')) {
+    $jsonContent = file_get_contents(dirname(__FILE__) . '/adminSettings.json');
+    $settings = json_decode($jsonContent, true);
+} else{
+    echo "Error. adminSettings.json does not exist.";
+}
+
 if (!isset($_GET['get']) && $_SERVER['REQUEST_URI'] != '/sanctum/csrf-cookie'){
     $currentUrl = $_SERVER['REQUEST_URI'];
-
-    // Get configuration
-    global $settings;
-    $settings = [];
-    $settings['copyright'] = "Does not exist";
-    if (file_exists(dirname(__FILE__) . '/adminSettings.json')) {
-        $jsonContent = file_get_contents(dirname(__FILE__) . '/adminSettings.json');
-        $settings = json_decode($jsonContent, true);
-    } else{
-        echo "Error. adminSettings.json does not exist.";
-    }
 
     // On the admin page
     if(explode('/', $currentUrl)[1] == 'admin'){
@@ -70,7 +71,22 @@ if (!isset($_GET['get']) && $_SERVER['REQUEST_URI'] != '/sanctum/csrf-cookie'){
             if(explode('/', $currentUrl)[3] == 'themes'){
                 include(dirname(__FILE__).'/adminThemes.php');
             }
+            // On the Plugins page
+            if(explode('/', $currentUrl)[3] == 'plugins'){
+                include(dirname(__FILE__).'/adminPlugins.php');
+            }
             exit();
+        }
+    }
+}
+
+// Enable the plugins
+foreach ($settings['plugins'] as $plugin) {
+    if(file_exists(dirname(__FILE__) . '/plugins/'.$plugin.'/main.ptero') && json_decode(file_get_contents(dirname(__FILE__) . '/plugins/'.$plugin.'/main.ptero')) !== null){
+        $pluginConfig = json_decode(file_get_contents(dirname(__FILE__) . '/plugins/'.$plugin.'/main.ptero'), true);
+
+        if(isset($pluginConfig['execute']) && file_exists(dirname(__FILE__) . '/plugins/'.$plugin.'/'.$pluginConfig['execute'])){
+            include(dirname(__FILE__) . '/plugins/'.$plugin.'/'.$pluginConfig['execute']);
         }
     }
 }
