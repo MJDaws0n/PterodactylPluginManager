@@ -72,3 +72,24 @@ function waitForElement(selector, callback) {
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
 }
+
+// Check for user being logged out
+var currentUri = window.location.pathname;
+if (!currentUri.startsWith("/auth/login")) {  
+  fetch('/api/client?page=1')
+    .then(response => {
+    if (!response.ok) {
+      if (response.status === 401) {
+        document.querySelector('body #app div[class*="NavigationBar__RightNavigation-sc-"] button').click();
+      } else {
+        console.error('Error:', response.status);
+      }
+      throw new Error('Network response was not ok.');
+    }
+    return response.json();
+  })
+    .then(data => {})
+    .catch(error => {
+    //document.querySelector('body #app div[class*="NavigationBar__RightNavigation-sc-"] button').click();
+  });
+}
