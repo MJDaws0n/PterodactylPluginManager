@@ -32,7 +32,11 @@ if (file_exists(dirname(__FILE__) . '/adminSettings.json')) {
     echo "Error. adminSettings.json does not exist.";
 }
 
-if (!isset($_GET['get']) && $_SERVER['REQUEST_URI'] != '/sanctum/csrf-cookie'){
+if (!isset($_GET['get']) && $_SERVER['REQUEST_URI'] != '/sanctum/csrf-cookie' &&
+!strpos($_SERVER['REQUEST_URI'],'.json') &&
+!strpos($_SERVER['REQUEST_URI'],'api') &&
+!strpos($_SERVER['REQUEST_URI'],'.php')
+){
     $currentUrl = $_SERVER['REQUEST_URI'];
 
     // On the admin page

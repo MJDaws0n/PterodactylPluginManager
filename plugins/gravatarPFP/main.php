@@ -33,7 +33,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
                             const icon = document.createElement('img');
 
                             // Set the source URL using MD5 from CryptoJS
-                            icon.src = 'https://www.gravatar.com/avatar/' + CryptoJS.MD5('d4ws70@gmail.com').toString() + '?s=20';
+                            icon.src = 'https://www.gravatar.com/avatar/' + CryptoJS.MD5(window.PterodactylUser.email).toString() + '?s=20';
 
                             // Append the new icon
                             document.querySelector('body #app div[class*="NavigationBar__RightNavigation-sc-"] a[href="/account"]').append(icon);

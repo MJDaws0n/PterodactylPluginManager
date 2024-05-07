@@ -93,3 +93,17 @@ if (!currentUri.startsWith("/auth/login")) {
     //document.querySelector('body #app div[class*="NavigationBar__RightNavigation-sc-"] button').click();
   });
 }
+
+// Create a listner for changing tabs
+document.addEventListener('pageChanged', ()=>{
+    if(document.querySelector('body #app div[class*="SubNavigation-sc-"] div')){
+        document.querySelectorAll('body #app div[class*="SubNavigation-sc-"] div a').forEach(element => {
+            if((element.hasAttribute('data-tabChangedChecked') && element.getAttribute('data-tabChangedChecked') != 'true') || (!element.hasAttribute('data-tabChangedChecked'))){
+                element.setAttribute('data-tabChangedChecked', 'true');
+                element.addEventListener('click', (e) => {
+                    document.dispatchEvent(new CustomEvent('tabChanged', { detail: { tab_name: element.textContent } }));
+                });
+            }
+        });
+    }
+});

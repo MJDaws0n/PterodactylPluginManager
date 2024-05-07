@@ -1,13 +1,13 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['custom:copyright'])){
     $newCopy = $_POST['custom:copyright'];
-  
+
     $jsonFile = dirname(__FILE__) . '/adminSettings.json';
     if (file_exists($jsonFile)) {
         $jsonContent = file_get_contents($jsonFile);
         $settingsObject = json_decode($jsonContent, true);
     }
-  
+
     $settingsObject['copyright'] = $newCopy;
     chmod($file, 0666);
     file_put_contents($jsonFile, json_encode($settingsObject));
@@ -66,7 +66,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
     } else {
         // Save the response to a variable
         $pingResponse = $response;
-        
+
         // Output the response
         echo str_replace($replacement, '', $pingResponse);
     }
@@ -98,15 +98,15 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
                 spanElement.parentElement.parentElement.classList.remove('active');
             }
         });
-        
+
         var title = document.querySelector('.content-wrapper .content-header h1');
         title.innerHTML = `Pterodactyl Custom Options<small>Condifgure Pterodactyl to your (actual) liking.</small>`;
-        
+
         var directory = document.querySelector('.content-wrapper .breadcrumb li');
         directory.innerHTML = `<a href="/admin">Admin  >  Custom</a>`;
         var directory2 = document.querySelector('.content-wrapper .breadcrumb li.active');
         directory2.textContent = `Settings`;
-        
+
         // Tabs
         var tabs = document.querySelector('.content-wrapper .nav-tabs-custom.nav-tabs-floating .nav.nav-tabs');
         Array.from(tabs.children).forEach((tab)=>{
@@ -114,12 +114,12 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
                 tab.remove();
             }
         });
-        
+
         // Settings
         // Remove other options
         var settingsOptions = document.querySelectorAll('.content-wrapper .content .box-body .form-group.col-md-4');
         var i = 0;
-        
+
         settingsOptions.forEach((option)=>{
             if(i == 0){
                 option.firstElementChild.textContent = 'Copyright Text';
@@ -131,7 +131,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
             }
             i++;
         });
-        
+
         // Make the saving work
         var settingsOptions = document.querySelector('.content-wrapper .content .col-xs-12 .box form');
         settingsOptions.action = '/admin/custom/general';

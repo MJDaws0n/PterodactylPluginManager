@@ -146,6 +146,23 @@ body.server_page.server_network #app div[class*="Fade__Container-sc-"] > section
 }
 
 
+body.server_page.server_subdomains #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div[class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > div[class*="GreyRowBox-sc-"]{
+  background-color: #2b2b2b;
+}
+body.server_page.server_subdomains #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div[class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > div[class*="GreyRowBox-sc-"]
+> div:nth-child(1) > div:nth-child(2) > code:nth-child(1){
+  background-color: #3d3d3d;
+}
+body.server_page.server_subdomains #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div[class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > div[class*="GreyRowBox-sc-"]
+> div:nth-child(1) > div:nth-child(3) > code:nth-child(1){
+  background-color: #3d3d3d;
+}
+body.server_page.server_subdomains #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div[class*="ContentContainer-sc-"][class*="PageContentBlock___StyledContentContainer-sc-"] > div[class*="GreyRowBox-sc-"]
+> div:nth-child(2) > div:nth-child(1) > textarea{
+  background-color: #3d3d3d;
+}
+
+
 body.server_page.server_activity #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div{
   background-color: #1B1B1B;
   border: none;

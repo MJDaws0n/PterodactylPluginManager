@@ -22,6 +22,9 @@ function updatePageStyles(){
     document.body.classList.remove("server_settings");
     document.body.classList.remove("server_activity");
 
+    /* To ensure it works properly with the subdomains plugin */
+    document.body.classList.remove("server_subdomains");
+
     if (currentUri.startsWith("/server/")) {
         document.body.classList.add("server_page");
         if(currentUri.includes('/files')){
@@ -45,6 +48,8 @@ function updatePageStyles(){
             document.body.classList.add("server_settings");
         } else if(currentUri.includes('/activity')){
             document.body.classList.add("server_activity");
+        } else if(currentUri.includes('/subdomains')){
+            document.body.classList.add("server_subdomains");
         } else{
             document.body.classList.add("server_console");
         }
