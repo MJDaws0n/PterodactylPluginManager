@@ -32,12 +32,13 @@ if (file_exists(dirname(__FILE__) . '/adminSettings.json')) {
     echo "Error. adminSettings.json does not exist.";
 }
 
+$currentUrl = $_SERVER['REQUEST_URI'];
+
 if (!isset($_GET['get']) && $_SERVER['REQUEST_URI'] != '/sanctum/csrf-cookie' &&
 !strpos($_SERVER['REQUEST_URI'],'.json') &&
 !strpos($_SERVER['REQUEST_URI'],'api') &&
 !strpos($_SERVER['REQUEST_URI'],'.php')
 ){
-    $currentUrl = $_SERVER['REQUEST_URI'];
 
     // On the admin page
     if(explode('/', $currentUrl)[1] == 'admin'){
@@ -93,4 +94,10 @@ foreach ($settings['plugins'] as $plugin) {
             include(dirname(__FILE__) . '/plugins/'.$plugin.'/'.$pluginConfig['execute']);
         }
     }
+}
+
+// Custom API page
+if(explode('/', $currentUrl)[1] == 'pluginapi'){
+    include(dirname(__FILE__) . '/pluginAPIManagement.php');
+    exit();
 }

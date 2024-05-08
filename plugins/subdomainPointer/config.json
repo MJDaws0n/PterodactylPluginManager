@@ -1,10 +1,10 @@
 {
-    "domains": {
-        "59067f55-fafa-4c69-9e2c-23c8474f95c3":{
+    "domains": [
+        {
             "name": "subtest.mjdawson.net",
             "server": "59067f55-fafa-4c69-9e2c-23c8474f95c3",
             "proxied": false,
             "notes": "Epic"
         }
-    }
+    ]
 }

@@ -32,6 +32,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
         
         ?>
         <script>
+        const themeSettings = JSON.parse(<?php echo json_encode(json_encode($theme));?>);
         if(typeof onAdminPage == 'undefined'){
             document.addEventListener('DOMContentLoaded', () => {
                 <?php if(isset($theme['use_default']) && !$theme['use_default']){?>

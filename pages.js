@@ -13,7 +13,7 @@ if(typeof onAdminPage !== 'undefined' && onAdminPage){
 } else{
     function changeFooter(observer){
         observer.disconnect();
-        const footer = document.querySelector('[class^="ContentContainer-"][class*=" PageContentBlock___StyledContentContainer"] [class^="PageContentBlock___Styled"]');
+        const footer = document.querySelector(themeSettings.copyright);
         footer.innerHTML = copyrightText;    // Not += because we want to completely remove what's already there
         observer.observe(document.documentElement,{childList:true,subtree:true});
     }
@@ -23,7 +23,7 @@ if(typeof onAdminPage !== 'undefined' && onAdminPage){
           if (mutation.addedNodes.length) {
             mutation.addedNodes.forEach((node) => {
                 if (node.nodeType === 1 && document.querySelector('#app').contains(node.parentNode)) {
-                    if(document.querySelector('[class^="ContentContainer-"][class*=" PageContentBlock___StyledContentContainer"] [class^="PageContentBlock___Styled"] a[class^="PageContentBlock___Styled"]')){
+                    if(document.querySelector(themeSettings.copyright_confirm)){
                         changeFooter(observer);
                     }
                 }
