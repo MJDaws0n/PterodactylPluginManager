@@ -225,6 +225,9 @@ body.server_page.server_subdomains #app div[class*="Fade__Container-sc-"] > sect
 > div:nth-child(2) > div:nth-child(1) > textarea{
   background-color: #3d3d3d;
 }
+body.server_page.server_subdomains [class*="EditScheduleModal___StyledDiv4-sc-"].MAIN_SELECT{
+  background-color: #3d3d3d;
+}
 
 
 body.server_page.server_activity #app div[class*="Fade__Container-sc-"] > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div{

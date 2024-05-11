@@ -21,5 +21,6 @@
   "server_tabs": "body #app div[class*=\"SubNavigation-sc-\"] div a",
   "server_tabs_active_class": "active",
   "server_tabs_type": "a",
-  "server_content": "body #app div[class*=\"App___StyledDiv-sc-\"] > div:nth-child(3) section > div:nth-child(1)"
+  "server_content": "body #app div[class*=\"App___StyledDiv-sc-\"] > div:nth-child(3) section > div:nth-child(1)",
+  "server_tab_whole_content": "body #app div[class*=\"App___StyledDiv-sc-\"] > div:nth-child(3) section"
 }
