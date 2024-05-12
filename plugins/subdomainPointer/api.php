@@ -6,43 +6,75 @@ if(isset(explode('/', $currentUrl)[3])){
     if(explode('/', $currentUrl)[3] == 'getsubdomains'){
         if(isset($_GET['server'])){
             // Get the config data
-            $data = json_decode(file_get_contents(dirname(__FILE__) . '/config.json'), true);
+            if(!file_exists(dirname(__FILE__) . '/config.json')){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Server error. No config file found."
+                ]);
+                exit();
+            }
+            if(!$data = json_decode(file_get_contents(dirname(__FILE__) . '/config.json'), true) ? : null){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Server error. Inavlid config file."
+                ]);
+                exit();
+            }
             
             $ch = curl_init("https://{$_SERVER['HTTP_HOST']}/api/client/servers/{$_GET['server']}");
             curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIE => $_SERVER['HTTP_COOKIE']]);
             $response = json_decode(curl_exec($ch), true);
-            $hasAccess = isset($response['object']) && $response['object'] == "server";
             curl_close($ch);
+
+            $hasAccess = isset($response['object']) && $response['object'] == "server";
+            if(!$hasAccess){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Unauthorised."
+                ]);
+                exit();
+            }
 
             // Get the requested server
             $specific_server = $_GET['server'];
             $options_with_specific_server = array();
 
             // Allow the request if the user is admin
-            if($hasAccess){
-                foreach ($data['domains'] as $domain) {
-                    if ($domain['server'] === $specific_server) {
-                        $options_with_specific_server[] = $domain;
-                    }
+            foreach ($data['domains'] as $domain) {
+                if ($domain['server'] === $specific_server) {
+                    $options_with_specific_server[] = $domain;
                 }
-    
-            } else {
-                echo json_encode([
-                    "success" => "false",
-                    "error" => "unauthorised"
-                ]);
-                exit();
             }
             echo json_encode([
                 "success" => "true",
                 "response" => $options_with_specific_server
             ]);
+            exit();
+        } else{
+            echo json_encode([
+                "success" => "false",
+                "error" => "No specified server."
+            ]);
+            exit();
         }
     }
     if(explode('/', $currentUrl)[3] == 'updateConfig'){
         if(isset($_GET['server']) && isset($_GET['config'])){
             // Get the config data
-            $data = json_decode(file_get_contents(dirname(__FILE__) . '/config.json'), true);
+            if(!file_exists(dirname(__FILE__) . '/config.json')){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Server error. No config file found."
+                ]);
+                exit();
+            }
+            if(!$data = json_decode(file_get_contents(dirname(__FILE__) . '/config.json'), true) ? : null){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Server error. Inavlid config file."
+                ]);
+                exit();
+            }
             
             $ch = curl_init("https://{$_SERVER['HTTP_HOST']}/api/client/servers/{$_GET['server']}");
             curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIE => $_SERVER['HTTP_COOKIE']]);
@@ -50,79 +82,115 @@ if(isset(explode('/', $currentUrl)[3])){
             curl_close($ch);
             $hasAccess = isset($response['object']) && $response['object'] == "server";
 
-            if($hasAccess){
-                foreach ($response['attributes']['relationships']['allocations']['data'] as $allocation) {
-                    if($allocation['attributes']['is_default']){
-                        $serverProxyUrl = 'http://'.$allocation['attributes']['ip_alias'].':'.$allocation['attributes']['port'];
-                    }
-                }
-
-                // Get the requested server
-                $specific_server = $_GET['server'];
-                $config = json_decode($_GET['config'], true);
-
-                function getServer($subdomain, $config){
-                    foreach ($config['domains'] as $domain) {
-                        if ($domain['name'] === $subdomain) {
-                            return $domain;
-                        }
-                    }
-                    return $domain;
-                }
-
-                $newData = $data;
-                $newData['domains'] = [];
-
-                // Allow the request if the user is admin
-                foreach ($data['domains'] as $domain) {
-                    if ($domain['server'] === $specific_server && getServer($domain['name'], $config)['name'] == $domain['name']) {
-                        // Check domains meet the specified domains regulations
-                        // Get the desired infomation
-                        $domainParts = explode('.', getServer($domain['name'], $config)['name']);
-                        $certs = ["fullchain"=>"", "privkey"=>""];
-
-                        // Domain and subdomain details
-                        $domainStr = implode('.', array_slice($domainParts, -2));
-                        $subdomainStr = implode('.', array_slice($domainParts, 0, -2));
-
-                        $domains = json_decode(file_get_contents(dirname(__FILE__) . '/domains.json'), true) ? : null;
-                        $found = false;
-                        foreach ($domains as $localDomain) {
-                            if($localDomain['domain'] == $domainStr){
-                                $found = true;
-                                if(!preg_match("/{$localDomain['allow']}/", $subdomainStr . '.' . $domainStr)){
-                                    echo json_encode(["success" => "false","error" => ('The selected subdomain does not comply with the domains settings. Please pick something else.')]);
-                                    exit();
-                                }
-
-                                $certs["fullchain"] = $localDomain['fullchain'];
-                                $certs["privkey"] = $localDomain['privkey'];
-                            }
-                        }
-                        if(!$found){
-                            echo json_encode(["success" => "false","error" => ('Domain not in domain list.')]);
-                            exit();
-                        }
-
-                        if(!$domain['proxied'] && getServer($domain['name'], $config)['proxied']){ // Is proxied but was not before
-                            // Add new value
-                            updateConfFile($domain['name'], $certs['fullchain'], $certs['privkey'], $serverProxyUrl);
-                        } else if($domain['proxied'] && !getServer($domain['name'], $config)['proxied']){ // Not proxied but was before
-                            // Remove value
-                            file_put_contents(dirname(__FILE__) . '/p80.conf', removeLastNewline(remove_section_between_markers(file_get_contents(dirname(__FILE__) . '/p80.conf'), '# START - '.$domain['name'], '# END - '.$domain['name'])));
-                            exec('sudo /usr/sbin/nginx -s reload');
-                        }
-
-                        $domain = getServer($domain['name'], $config);
-                    }
-                    array_push($newData['domains'], $domain);
-                }
-            } else {
+            if(!$hasAccess || !isset($response['attributes']['relationships']['allocations']['data'])){
                 echo json_encode([
                     "success" => "false",
-                    "error" => "unauthorised"
+                    "error" => "unauthorised."
                 ]);
                 exit();
+            }
+            $allocationFound = false;
+            foreach ($response['attributes']['relationships']['allocations']['data'] as $allocation) {
+                if($allocation['attributes']['is_default']){
+                    $allocationFound = true;
+                    $serverProxyUrl = 'http://'.$allocation['attributes']['ip_alias'].':'.$allocation['attributes']['port'];
+                }
+            }
+            if(!$allocationFound){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Server error. Default allocation not found."
+                ]);
+                exit();
+            }
+
+            // Get the requested server
+            $specific_server = $_GET['server'];
+
+            if(!$config = json_decode($_GET['config'], true) ? : null){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Invalid specified config."
+                ]);
+                exit();
+            }
+
+            // Function to get the server
+            function getServer($subdomain, $config){
+                foreach ($config['domains'] as $domain) {
+                    if ($domain['name'] === $subdomain) {
+                        return $domain;
+                    }
+                }
+                return $domain;
+            }
+
+            $newData = $data;
+            $newData['domains'] = [];
+
+            foreach ($data['domains'] as $domain) {
+                if ($domain['server'] == $specific_server && getServer($domain['name'], $config)['name'] == $domain['name']) {
+                    // Check domains meet the specified domains regulations
+                    // Get the desired infomation
+                    $domainParts = explode('.', getServer($domain['name'], $config)['name']);
+                    $certs = ["fullchain"=>"", "privkey"=>""];
+
+                    // Domain and subdomain details
+                    $domainStr = implode('.', array_slice($domainParts, -2));
+                    $subdomainStr = implode('.', array_slice($domainParts, 0, -2));
+
+                    if(!file_exists(dirname(__FILE__) . '/domains.json')){
+                        echo json_encode([
+                            "success" => "false",
+                            "error" => "Server error. Missing domains list file."
+                        ]);
+                        exit();
+                    }
+                    if(!$domains = json_decode(file_get_contents(dirname(__FILE__) . '/domains.json'), true) ? : null){
+                        echo json_encode([
+                            "success" => "false",
+                            "error" => "Server error. Domains list is invalid."
+                        ]);
+                        exit();
+                    }
+                    $found = false;
+                    foreach ($domains as $localDomain) {
+                        if($localDomain['domain'] == $domainStr){
+                            $found = true;
+                            if(!preg_match("/{$localDomain['allow']}/", $subdomainStr . '.' . $domainStr)){
+                                echo json_encode(["success" => "false","error" => ('The selected subdomain does not comply with the domains settings. Please pick something else.')]);
+                                exit();
+                            }
+
+                            $certs["fullchain"] = $localDomain['fullchain'];
+                            $certs["privkey"] = $localDomain['privkey'];
+                        }
+                    }
+                    if(!$found){
+                        echo json_encode(["success" => "false","error" => ('Domain not in domain list.')]);
+                        exit();
+                    }
+
+                    if(!$domain['proxied'] && getServer($domain['name'], $config)['proxied']){ // Is proxied but was not before
+                        // Add new value
+                        updateConfFile($domain['name'], $certs['fullchain'], $certs['privkey'], $serverProxyUrl);
+                    } else if($domain['proxied'] && !getServer($domain['name'], $config)['proxied']){ // Not proxied but was before
+                        // Remove value
+                        if(!file_exists(dirname(__FILE__) . '/p80.conf')){
+                            echo json_encode([
+                                "success" => "false",
+                                "error" => "Server error. Missing p80.conf file."
+                            ]);
+                            exit();
+                        }
+                        
+                        file_put_contents(dirname(__FILE__) . '/p80.conf', removeLastNewline(remove_section_between_markers(file_get_contents(dirname(__FILE__) . '/p80.conf'), '# START - '.$domain['name'], '# END - '.$domain['name'])));
+                        exec('sudo /usr/sbin/nginx -s reload');
+                    }
+
+                    $domain = getServer($domain['name'], $config);
+                }
+                array_push($newData['domains'], $domain);
             }
             // Modify the 'config.json' file
             file_put_contents(dirname(__FILE__) . '/config.json', json_encode($newData));
@@ -628,3 +696,12 @@ function remove_section_between_markers($text, $start_marker, $end_marker) {
 function removeLastNewline($string) {
     return substr($string, -1) === "\n" ? rtrim($string, "\n") : $string;
 }
+
+/*
+    Sorting out status
+    Doing - updateConfig
+    Done (
+        -   getsubdomains
+    )
+*/
+// Need to finish off updateConfig (don't get fooled, it is un fishied) but also need to start to validate things like $domain['name'] for example, actually exists.
