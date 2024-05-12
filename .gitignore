@@ -1,7 +1,6 @@
 .vscode
 .env
-<<<<<<< HEAD
 plugins/subdomainPointer/proxy/certificates/*
 plugins/subdomainPointer/proxy/node_modules/*
-=======
->>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
+plugins/subdomainPointer/p80.conf
+p80.conf

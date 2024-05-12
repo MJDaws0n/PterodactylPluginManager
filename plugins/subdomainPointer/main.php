@@ -13,7 +13,6 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
             var currentUri = window.location.pathname;
             var serverInfomation = false;
 
-<<<<<<< HEAD
             // Get a list of domains that we can use
             var domainList = [];
             fetch('https://panel.webworkshub.online/pluginapi/subdomainPointer/getDomains/')
@@ -37,8 +36,6 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
                 document.head.append(sweetalert);
             }
 
-=======
->>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
             document.addEventListener('pageChanged', ()=>{
                 currentUri = window.location.pathname;
                 if (currentUri.startsWith("/server")) {
@@ -584,11 +581,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
                     document.head.append(sweetalert);
                     setTimeout(()=>{
                         showPopup();
-<<<<<<< HEAD
                     }, 100)
-=======
-                    }, 10)
->>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                 } else{
                     showPopup();
                 }
@@ -823,23 +816,16 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
                     document.head.append(sweetalert);
                     setTimeout(()=>{
                         showPopup();
-<<<<<<< HEAD
                     }, 100)
-=======
-                    }, 10)
->>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                 } else{
                     showPopup();
                 }
                 function showPopup(){
-<<<<<<< HEAD
                     var domainListHTML = '';
 
                     for (let domain in domainList) {
                         domainListHTML += `<option value="${domainList[domain]}">.${domainList[domain]}</option>`;
                     }
-=======
->>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                     Swal.fire({
                     title: 'Create a new subdomain',
                     html:
@@ -847,12 +833,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET'){
                         <label class="Label-sc- DOMAINS_LABEL">Domain</label>
                         <input type="text" min="3" max="10" class="Input-sc- SUBDOMAIN_INPUT" name="subdomainValue" oninput="validateSubdomainCharacter(event)"></input>
                         <select class="DOMAIN_DROPDOWN" name="domainValue">
-<<<<<<< HEAD
                             ${domainListHTML}
-=======
-                            <option value="mjdawson.net">.mjdawson.net</option>
-                            <option value="public.webworkshub.online">.public.webworkshub.online</option>
->>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                         </select>
                         <div class="EditScheduleModal___StyledDiv4-sc- MAIN_SELECT">
                             <div>
