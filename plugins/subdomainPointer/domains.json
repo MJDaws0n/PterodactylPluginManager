@@ -1,0 +1,16 @@
+[
+    {
+        "domain": "mjdawson.net",
+        "display": "mjdawson.net",
+        "allow": "^.*\\.mjdawson\\.net$",
+        "fullchain": "/etc/letsencrypt/live/mjdawson.net-0001/fullchain.pem",
+        "privkey": "/etc/letsencrypt/live/mjdawson.net-0001/privkey.pem"
+    },
+    {
+        "domain": "webworkshub.online",
+        "display": "public.webworkshub.online",
+        "allow": "^.*\\.public\\.webworkshub\\.online$",
+        "fullchain": "/etc/letsencrypt/live/public.webworkshub.online/fullchain.pem",
+        "privkey": "/etc/letsencrypt/live/public.webworkshub.online/privkey.pem"
+    }
+]

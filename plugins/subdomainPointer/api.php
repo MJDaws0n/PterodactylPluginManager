@@ -1,7 +1,10 @@
 <?php
+<<<<<<< HEAD
+=======
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
 header('Content-Type: application/json');
 
 $currentUrl = $_SERVER['REQUEST_URI'];
@@ -50,6 +53,74 @@ if(isset(explode('/', $currentUrl)[3])){
             $ch = curl_init("https://{$_SERVER['HTTP_HOST']}/api/client/servers/{$_GET['server']}");
             curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIE => $_SERVER['HTTP_COOKIE']]);
             $response = json_decode(curl_exec($ch), true);
+<<<<<<< HEAD
+            curl_close($ch);
+            $hasAccess = isset($response['object']) && $response['object'] == "server";
+
+            if($hasAccess){
+                foreach ($response['attributes']['relationships']['allocations']['data'] as $allocation) {
+                    if($allocation['attributes']['is_default']){
+                        $serverProxyUrl = 'http://'.$allocation['attributes']['ip_alias'].':'.$allocation['attributes']['port'];
+                    }
+                }
+
+                // Get the requested server
+                $specific_server = $_GET['server'];
+                $config = json_decode($_GET['config'], true);
+
+                function getServer($subdomain, $config){
+                    foreach ($config['domains'] as $domain) {
+                        if ($domain['name'] === $subdomain) {
+                            return $domain;
+                        }
+                    }
+                    return $domain;
+                }
+
+                $newData = $data;
+                $newData['domains'] = [];
+
+                // Allow the request if the user is admin
+                foreach ($data['domains'] as $domain) {
+                    if ($domain['server'] === $specific_server && getServer($domain['name'], $config)['name'] == $domain['name']) {
+                        // Check domains meet the specified domains regulations
+                        // Get the desired infomation
+                        $domainParts = explode('.', getServer($domain['name'], $config)['name']);
+                        $certs = ["fullchain"=>"", "privkey"=>""];
+
+                        // Domain and subdomain details
+                        $domainStr = implode('.', array_slice($domainParts, -2));
+                        $subdomainStr = implode('.', array_slice($domainParts, 0, -2));
+
+                        $domains = json_decode(file_get_contents(dirname(__FILE__) . '/domains.json'), true) ? : null;
+                        $found = false;
+                        foreach ($domains as $localDomain) {
+                            if($localDomain['domain'] == $domainStr){
+                                $found = true;
+                                if(!preg_match("/{$localDomain['allow']}/", $subdomainStr . '.' . $domainStr)){
+                                    echo json_encode(["success" => "false","error" => ('The selected subdomain does not comply with the domains settings. Please pick something else.')]);
+                                    exit();
+                                }
+
+                                $certs["fullchain"] = $localDomain['fullchain'];
+                                $certs["privkey"] = $localDomain['privkey'];
+                            }
+                        }
+                        if(!$found){
+                            echo json_encode(["success" => "false","error" => ('Domain not in domain list.')]);
+                            exit();
+                        }
+
+                        if(!$domain['proxied'] && getServer($domain['name'], $config)['proxied']){ // Is proxied but was not before
+                            // Add new value
+                            updateConfFile($domain['name'], $certs['fullchain'], $certs['privkey'], $serverProxyUrl);
+                        } else if($domain['proxied'] && !getServer($domain['name'], $config)['proxied']){ // Not proxied but was before
+                            // Remove value
+                            file_put_contents(dirname(__FILE__) . '/p80.conf', removeLastNewline(remove_section_between_markers(file_get_contents(dirname(__FILE__) . '/p80.conf'), '# START - '.$domain['name'], '# END - '.$domain['name'])));
+                            exec('sudo /usr/sbin/nginx -s reload');
+                        }
+
+=======
             $hasAccess = isset($response['object']) && $response['object'] == "server";
             curl_close($ch);
 
@@ -75,6 +146,7 @@ if(isset(explode('/', $currentUrl)[3])){
             if($hasAccess){
                 foreach ($data['domains'] as $domain) {
                     if ($domain['server'] === $specific_server && getServer($domain['name'], $config)['name'] == $domain['name']) {
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                         $domain = getServer($domain['name'], $config);
                     }
                     array_push($newData['domains'], $domain);
@@ -148,11 +220,14 @@ if(isset(explode('/', $currentUrl)[3])){
                             exit();
                         }
 
+<<<<<<< HEAD
+=======
                         if (!preg_match('/^[a-zA-Z0-9\-]+$/', $subdomain)) {
                             echo json_encode(["success" => "false","error" => ('Invalid subdomain name.')]);
                             exit();
                         }
 
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                         // Cloudflare API endpoint
                         $endpoint = "https://api.cloudflare.com/client/v4/zones";
 
@@ -222,6 +297,13 @@ if(isset(explode('/', $currentUrl)[3])){
                             echo json_encode(["success" => "false","error" => ('Server error. Unknown error occurred.')]);
                             exit();
                         }
+<<<<<<< HEAD
+
+                        // Remove from p80 conf
+                        file_put_contents(dirname(__FILE__) . '/p80.conf', removeLastNewline(remove_section_between_markers(file_get_contents(dirname(__FILE__) . '/p80.conf'), '# START - '.$domain['name'], '# END - '.$domain['name'])));
+                        exec('sudo /usr/sbin/nginx -s reload');
+=======
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                     }
                 }
                 // Get the new data again (it may have been updated)
@@ -278,12 +360,24 @@ if(isset(explode('/', $currentUrl)[3])){
                     }
                 }
 
+<<<<<<< HEAD
+                foreach ($response['attributes']['relationships']['allocations']['data'] as $allocation) {
+                    if($allocation['attributes']['is_default']){
+                        $serverProxyUrl = 'http://'.$allocation['attributes']['ip_alias'].':'.$allocation['attributes']['port'];
+                    }
+                }
+
+=======
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                 // Get the requested server
                 $specific_server = $_GET['server'];
                 $config = json_decode($_GET['config'], true)['domains'][0];
 
+<<<<<<< HEAD
+=======
                 $newData = $data;
 
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                 // Check the domain is not already in use
                 foreach ($data['domains'] as $domain) {
                     if ($domain['name'] == $config['name']) {
@@ -371,6 +465,33 @@ if(isset(explode('/', $currentUrl)[3])){
                 $subdomain = implode('.', array_slice($domainParts, 0, -2));
                 $targetCNAME = $serverIP['ip_alias'];
 
+<<<<<<< HEAD
+                // Check domains meet the specified domains regulations
+                $domains = json_decode(file_get_contents(dirname(__FILE__) . '/domains.json'), true) ? : null;
+                $certs = ["fullchain"=>"", "privkey"=>""];
+
+                $found = false;
+
+                foreach ($domains as $localDomain) {
+                    if($localDomain['domain'] == $domain){
+                        $found = true;
+                        if(!preg_match("/{$localDomain['allow']}/", $subdomain . '.' . $domain)){
+                            echo json_encode(["success" => "false","error" => ('The selected subdomain does not comply with the domains settings. Please pick something else.')]);
+                            exit();
+                        }
+
+                        $certs["fullchain"] = $localDomain['fullchain'];
+                        $certs["privkey"] = $localDomain['privkey'];
+                    }
+                }
+
+                if(!$found){
+                    echo json_encode(["success" => "false","error" => ('Domain not in domain list.')]);
+                    exit();
+                }
+
+=======
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                 // More validation
                 if(strlen($subdomain) <= 1){
                     echo json_encode(["success" => "false","error" => ('Please ensure that subdomain is at least 1 character.')]);
@@ -382,11 +503,14 @@ if(isset(explode('/', $currentUrl)[3])){
                     exit();
                 }
 
+<<<<<<< HEAD
+=======
                 if (!preg_match('/^[a-zA-Z0-9\-]+$/', $subdomain)) {
                     echo json_encode(["success" => "false","error" => ('Invalid subdomain name.')]);
                     exit();
                 }
 
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                 // Cloudflare API endpoint
                 $endpoint = "https://api.cloudflare.com/client/v4/zones";
 
@@ -444,6 +568,17 @@ if(isset(explode('/', $currentUrl)[3])){
                     exit();
                 }
 
+<<<<<<< HEAD
+                // Add to p80.conf
+                if($config['proxied']){
+                    updateConfFile($config['name'], $certs['fullchain'], $certs['privkey'], $serverProxyUrl);
+                }
+
+                // Get the latest file infomation
+                $newData = json_decode(file_get_contents(dirname(__FILE__) . '/config.json'), true);
+
+=======
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
                 // Finally push the array to the file
                 array_push($newData['domains'], $config);
             } else {
@@ -461,4 +596,105 @@ if(isset(explode('/', $currentUrl)[3])){
             ]);
         }
     }
+<<<<<<< HEAD
+    if(explode('/', $currentUrl)[3] == 'getDomains'){
+        if(file_exists(dirname(__FILE__) . '/domains.json')){
+            $domains = json_decode(file_get_contents(dirname(__FILE__) . '/domains.json'), true) ? : null;
+            $domainsReturn = [];
+
+            foreach ($domains as $domain) {
+                $domainsReturn[$domain['domain']] = $domain['display'];
+            }
+
+            echo json_encode([
+                "success" => "true",
+                "results" => $domainsReturn
+            ]);
+            exit();
+        } else{
+            echo json_encode([
+                "success" => "false",
+                "error" => "Invalid config.".dirname(__FILE__) . '/domains.json'
+            ]);
+            exit();
+        }
+    }
+}
+
+function updateConfFile($serverName, $sslCertPath, $sslKeyPath, $proxyPass){
+    $confDir = dirname(__FILE__) . '/p80.conf';
+
+    // Check the config exists
+    if(!file_exists($confDir)){
+        echo json_encode([
+            "success" => "false",
+            "error" => "No Nginx config file found."
+        ]);
+        exit();
+    }
+
+    // Get template
+    if(!file_exists(dirname(__FILE__) . '/template.conf')){
+        echo json_encode([
+            "success" => "false",
+            "error" => "No Nginx template config file found."
+        ]);
+        exit();
+    }
+
+    $template = file_get_contents(dirname(__FILE__) . '/template.conf');
+
+    $config = str_replace(
+        array('{{SERVER_NAME}}', '{{SSL_CERT}}', '{{SSL_KEY}}', '{{PROXY_PASS}}'),
+        array($serverName, $sslCertPath, $sslKeyPath, $proxyPass),
+        $template
+    );
+
+    $oldConfig = file_get_contents($confDir);
+
+    $newConfig = removeLastNewline(remove_section_between_markers($oldConfig, '# START - '.$serverName, '# END - '.$serverName))."\n".$config;
+    file_put_contents(dirname(__FILE__) . '/p80.conf', $newConfig);
+
+    $envFile = __DIR__ . '/.env';
+    if (file_exists($envFile)) {
+        $env = parse_ini_file($envFile);
+        if (!$env) {
+            echo json_encode([
+                "success" => "false",
+                "error" => "Missing .env file."
+            ]);
+            exit();
+        }
+    } else {
+        echo json_encode([
+            "success" => "false",
+            "error" => "Missing .env file."
+        ]);
+        exit();
+    }
+
+    exec("sudo /usr/sbin/nginx -t", $output, $return_var);
+    
+    // Check if test was successful
+    if ($return_var !== 0) {
+        // Go back to old config
+        file_put_contents(dirname(__FILE__) . '/p80.conf', $oldConfig);
+        echo json_encode([
+            "success" => "false",
+            "error" => "Failed to valididate new config.",
+            "config" => $newConfig
+        ]);
+        exit();
+    } else{
+        exec('sudo /usr/sbin/nginx -s reload', $output, $return_var);
+        return true;
+    }
+}
+function remove_section_between_markers($text, $start_marker, $end_marker) {
+    return preg_replace("/$start_marker.*?$end_marker/s", "", $text);
+}
+function removeLastNewline($string) {
+    return substr($string, -1) === "\n" ? rtrim($string, "\n") : $string;
+=======
+>>>>>>> 6e8607a5f7b7c0e7b9caedb44b6f1efb98961dd4
 }
