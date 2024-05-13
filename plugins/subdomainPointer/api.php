@@ -85,7 +85,7 @@ if(isset(explode('/', $currentUrl)[3])){
             if(!$hasAccess || !isset($response['attributes']['relationships']['allocations']['data'])){
                 echo json_encode([
                     "success" => "false",
-                    "error" => "unauthorised."
+                    "error" => "Unauthorised."
                 ]);
                 exit();
             }
@@ -107,6 +107,7 @@ if(isset(explode('/', $currentUrl)[3])){
             // Get the requested server
             $specific_server = $_GET['server'];
 
+            // Validate the config
             if(!$config = json_decode($_GET['config'], true) ? : null){
                 echo json_encode([
                     "success" => "false",
@@ -114,6 +115,8 @@ if(isset(explode('/', $currentUrl)[3])){
                 ]);
                 exit();
             }
+
+            validateConfig($config);
 
             // Function to get the server
             function getServer($subdomain, $config){
@@ -125,12 +128,36 @@ if(isset(explode('/', $currentUrl)[3])){
                 return $domain;
             }
 
+            if(!isset($data['domains'])){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Server error. Invalid config file."
+                ]);
+                exit();
+            }
+
             $newData = $data;
             $newData['domains'] = [];
 
+            $domainFound = false;
+
             foreach ($data['domains'] as $domain) {
+                if(
+                    !isset($domain['name']) ||
+                    !isset($domain['server']) ||
+                    !isset($domain['proxied']) ||
+                    !isset($domain['notes'])
+                ){
+                    echo json_encode([
+                        "success" => "false",
+                        "error" => "Server error. Invalid config file."
+                    ]);
+                    exit();
+                }
                 if ($domain['server'] == $specific_server && getServer($domain['name'], $config)['name'] == $domain['name']) {
+                    $domainFound = true;
                     // Check domains meet the specified domains regulations
+
                     // Get the desired infomation
                     $domainParts = explode('.', getServer($domain['name'], $config)['name']);
                     $certs = ["fullchain"=>"", "privkey"=>""];
@@ -146,6 +173,13 @@ if(isset(explode('/', $currentUrl)[3])){
                         ]);
                         exit();
                     }
+                    if(!file_exists(dirname(__FILE__) . '/domains.json')){
+                        echo json_encode([
+                            "success" => "false",
+                            "error" => "Server error. Domains list connfig file not found."
+                        ]);
+                        exit();
+                    }
                     if(!$domains = json_decode(file_get_contents(dirname(__FILE__) . '/domains.json'), true) ? : null){
                         echo json_encode([
                             "success" => "false",
@@ -155,6 +189,27 @@ if(isset(explode('/', $currentUrl)[3])){
                     }
                     $found = false;
                     foreach ($domains as $localDomain) {
+                        if(!isset($localDomain['domain'])){
+                            echo json_encode([
+                                "success" => "false",
+                                "error" => "Server error. Domains list contains invalid domain configuration: Section 'name'."
+                            ]);
+                            exit();
+                        }
+                        if(!isset($localDomain['fullchain']) || !isset($localDomain['privkey'])){
+                            echo json_encode([
+                                "success" => "false",
+                                "error" => "Server error. Domains list contains invalid domain configuration: Section 'fullchain' or 'privkey'."
+                            ]);
+                            exit();
+                        }
+                        if(!isset($localDomain['allow'])){
+                            echo json_encode([
+                                "success" => "false",
+                                "error" => "Server error. Domains list contains invalid domain configuration: Section 'allow'."
+                            ]);
+                            exit();
+                        }
                         if($localDomain['domain'] == $domainStr){
                             $found = true;
                             if(!preg_match("/{$localDomain['allow']}/", $subdomainStr . '.' . $domainStr)){
@@ -192,164 +247,266 @@ if(isset(explode('/', $currentUrl)[3])){
                 }
                 array_push($newData['domains'], $domain);
             }
+            if(!$domainFound){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Domain not registerd to this server."
+                ]);
+                exit();
+            }
             // Modify the 'config.json' file
             file_put_contents(dirname(__FILE__) . '/config.json', json_encode($newData));
 
             echo json_encode([
                 "success" => "true"
             ]);
+        } else{
+            echo json_encode([
+                "success" => "false",
+                "error" => "No specified server and or config."
+            ]);
+            exit();
         }
     }
     if(explode('/', $currentUrl)[3] == 'remove'){
         if(isset($_GET['server']) && isset($_GET['name'])){
             // Get the config data
-            $data = json_decode(file_get_contents(dirname(__FILE__) . '/config.json'), true);
+            if(!file_exists(dirname(__FILE__) . '/config.json')){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Server error. No config file found."
+                ]);
+                exit();
+            }
+            if(!$data = json_decode(file_get_contents(dirname(__FILE__) . '/config.json'), true) ? : null){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Server error. Inavlid config file."
+                ]);
+                exit();
+            }
             
             $ch = curl_init("https://{$_SERVER['HTTP_HOST']}/api/client/servers/{$_GET['server']}");
             curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIE => $_SERVER['HTTP_COOKIE']]);
             $response = json_decode(curl_exec($ch), true);
-            $hasAccess = isset($response['object']) && $response['object'] == "server";
             curl_close($ch);
+
+            // Check the user has access
+            $hasAccess = isset($response['object']) && $response['object'] == "server";
+            if(!$hasAccess || !isset($response['attributes']['relationships']['allocations']['data'])){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Unauthorised."
+                ]);
+                exit();
+            }
 
             // Get the requested server
             $specific_server = $_GET['server'];
             $domainName = $_GET['name'];
 
-            // Allow the request if the user is admin
-            if($hasAccess){
-                foreach ($data['domains'] as $domain) {
-                    if ($domain['server'] === $specific_server && $domain['name'] == $domainName) {
-                        // Found the domain to remove
-
-                        // Remove the domain from cloudflare
-                        // Load environment variables from .env file
-                        $envFile = __DIR__ . '/.env';
-                        if (file_exists($envFile)) {
-                            $env = parse_ini_file($envFile);
-                            if (!$env) {
-                                die('.env file is invalid or empty.');
-                            }
-                        } else {
-                            die('.env file not found.');
-                        }
-
-                        $email = isset($env['CLOUDFLARE_EMAIL']) ? $env['CLOUDFLARE_EMAIL'] : null;
-                        $apiToken = isset($env['CLOUDFLARE_API_TOKEN']) ? $env['CLOUDFLARE_API_TOKEN'] : null;
-
-                        // Get the desired information
-                        $domainParts = explode('.', $domain['name']);
-
-                        // Domain and subdomain details
-                        $domainStr = implode('.', array_slice($domainParts, -2));
-                        $subdomain = implode('.', array_slice($domainParts, 0, -2));
-
-                        // More validation
-                        if(strlen($subdomain) <= 1){
-                            echo json_encode(["success" => "false","error" => ('Please ensure that subdomain is at least 1 character.')]);
-                            exit();
-                        }
-
-                        if (!filter_var($domainStr, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
-                            echo json_encode(["success" => "false","error" => ('Invalid domain name.')]);
-                            exit();
-                        }
-
-                        // Cloudflare API endpoint
-                        $endpoint = "https://api.cloudflare.com/client/v4/zones";
-
-                        // Zone ID for the domain - automatically fetched
-                        $zoneID = ''; 
-
-                        // Fetch zone ID for the domain
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_URL, $endpoint . '?name=' . $domainStr);
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                            'X-Auth-Email: ' . $email,
-                            'Authorization: Bearer ' . $apiToken,
-                            'Content-Type: application/json'
+            foreach ($data['domains'] as $domain) {
+                if ($domain['server'] === $specific_server && $domain['name'] == $domainName) {
+                    // Validation
+                    if(
+                        !isset($domain['name']) ||
+                        !isset($domain['server']) ||
+                        !isset($domain['proxied']) ||
+                        !isset($domain['notes'])
+                    ){
+                        echo json_encode([
+                            "success" => "false",
+                            "error" => "Server error. Invalid config file."
                         ]);
-                        $response = curl_exec($ch);
-                        curl_close($ch);
+                        exit();
+                    }
 
-                        $result = json_decode($response, true);
-
-                        if ($result && isset($result['result'][0]['id'])) {
-                            $zoneID = $result['result'][0]['id'];
-                        } else {
-                            echo json_encode(["success" => "false","error" => ('Server error. Domain name not registered to account.')]);
+                    // Remove the domain from cloudflare
+                    // Load environment variables from .env file
+                    $envFile = __DIR__ . '/.env';
+                    if (file_exists($envFile)) {
+                        $env = parse_ini_file($envFile);
+                        if (!$env) {
+                            echo json_encode([
+                                "success" => "false",
+                                "error" => "Server error. .env file is invalid or empty."
+                            ]);
                             exit();
                         }
-
-                        // List all the records and remove the correct one
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_URL, $endpoint . '/'.$zoneID.'/dns_records');
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                            'X-Auth-Email: ' . $email,
-                            'Authorization: Bearer ' . $apiToken,
-                            'Content-Type: application/json'
+                    } else {
+                        echo json_encode([
+                            "success" => "false",
+                            "error" => "Server error. .env file now found."
                         ]);
-                        $response = curl_exec($ch);
-                        curl_close($ch);
+                        exit();
+                    }
 
-                        $domainID = '';
-
-                        $result = json_decode($response, true)['result'];
-
-                        foreach ($result as $record) {
-                            if($record['name'] == $subdomain.'.'.$domainStr){
-                                $domainID = $record['id'];
-                            }
-                        }
-
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_URL, $endpoint . '/' . $zoneID . '/dns_records/'.$domainID);
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                            'X-Auth-Email: ' . $email,
-                            'Authorization: Bearer ' . $apiToken,
-                            'Content-Type: application/json'
+                    if(!$email = isset($env['CLOUDFLARE_EMAIL']) ? $env['CLOUDFLARE_EMAIL'] : null){
+                        echo json_encode([
+                            "success" => "false",
+                            "error" => "Server error. .env file is missing CLOUDFLARE_EMAIL."
                         ]);
-                        $response = curl_exec($ch);
-                        curl_close($ch);
-        
-                        $result = json_decode($response, true);
-                        if (!($result && isset($result['success']) && $result['success']) && ($result && isset($result['errors'][0]['message']))) {
-                            echo json_encode(["success" => "false","error" => ('Server error. '.$result['errors'][0]['message'])]);
-                            exit();
-                        } else if(!($result && isset($result['success']) && $result['success']) && !($result && isset($result['errors'][0]['message']))) {
-                            echo json_encode(["success" => "false","error" => ('Server error. Unknown error occurred.')]);
+                        exit();
+                    }
+                    if(!$apiToken = isset($env['CLOUDFLARE_API_TOKEN']) ? $env['CLOUDFLARE_API_TOKEN'] : null){
+                        echo json_encode([
+                            "success" => "false",
+                            "error" => "Server error. .env file is missing CLOUDFLARE_API_TOKEN."
+                        ]);
+                        exit();
+                    }
+
+                    // Get the desired information
+                    $domainParts = explode('.', $domain['name']);
+
+                    // Domain and subdomain details
+                    $domainStr = implode('.', array_slice($domainParts, -2));
+                    $subdomain = implode('.', array_slice($domainParts, 0, -2));
+
+                    // More validation
+                    if(strlen($subdomain) <= 1){
+                        echo json_encode(["success" => "false","error" => ('Please ensure that subdomain is at least 1 character.')]);
+                        exit();
+                    }
+
+                    if (!filter_var($domainStr, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
+                        echo json_encode(["success" => "false","error" => ('Invalid domain name.')]);
+                        exit();
+                    }
+
+                    // Cloudflare API endpoint
+                    $endpoint = "https://api.cloudflare.com/client/v4/zones";
+
+                    // Zone ID for the domain - automatically fetched
+                    $zoneID = ''; 
+
+                    // Fetch zone ID for the domain
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $endpoint . '?name=' . $domainStr);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'X-Auth-Email: ' . $email,
+                        'Authorization: Bearer ' . $apiToken,
+                        'Content-Type: application/json'
+                    ]);
+                    $response = curl_exec($ch);
+                    curl_close($ch);
+
+                    $result = json_decode($response, true);
+
+                    if ($result && isset($result['result'][0]['id'])) {
+                        $zoneID = $result['result'][0]['id'];
+                    } else {
+                        echo json_encode(["success" => "false","error" => ('Server error. Cloudflare rejected request. This is usually becasue your Key / Email is Invalid or the domain is not registerd with your account.')]);
+                        exit();
+                    }
+
+                    // List all the records and remove the correct one
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $endpoint . '/'.$zoneID.'/dns_records');
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'X-Auth-Email: ' . $email,
+                        'Authorization: Bearer ' . $apiToken,
+                        'Content-Type: application/json'
+                    ]);
+                    $response = curl_exec($ch);
+                    curl_close($ch);
+
+                    $domainID = '';
+
+                    if(!$result = json_decode($response, true) ?: null){
+                        echo json_encode(["success" => "false","error" => ('Server error. Cloudflare rejected listing the subdomains.')]);
+                        exit();
+                    }
+                    if(!$result = $result['result'] ?: null){
+                        echo json_encode(["success" => "false","error" => ('Server error. Cloudflare rejected listing the subdomains.')]);
+                        exit();
+                    }
+
+                    foreach ($result as $record) {
+                        if(!isset($record['name']) || !isset($record['id'])){
+                            echo json_encode(["success" => "false","error" => ('Server error. Cloudflare response contains invalid data.')]);
                             exit();
                         }
+                        if($record['name'] == $subdomain.'.'.$domainStr){
+                            $domainID = $record['id'];
+                        }
+                    }
 
-                        // Remove from p80 conf
-                        file_put_contents(dirname(__FILE__) . '/p80.conf', removeLastNewline(remove_section_between_markers(file_get_contents(dirname(__FILE__) . '/p80.conf'), '# START - '.$domain['name'], '# END - '.$domain['name'])));
-                        exec('sudo /usr/sbin/nginx -s reload');
-                    }
-                }
-                // Get the new data again (it may have been updated)
-                $data = json_decode(file_get_contents(dirname(__FILE__) . '/config.json'), true);
-                $newData = $data;
-                $newData['domains'] = [];
-
-                // Check again as the file may have changed
-                foreach ($data['domains'] as $domain) {
-                    if ($domain['server'] === $specific_server && $domain['name'] == $domainName) {
-                        unset($domain);
-                    }
-                    if(isset($domain)){
-                        array_push($newData['domains'], $domain);
-                    }
-                }
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $endpoint . '/' . $zoneID . '/dns_records/'.$domainID);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'X-Auth-Email: ' . $email,
+                        'Authorization: Bearer ' . $apiToken,
+                        'Content-Type: application/json'
+                    ]);
+                    $response = curl_exec($ch);
+                    curl_close($ch);
     
-            } else {
+                    $result = json_decode($response, true);
+                    if (!($result && isset($result['success']) && $result['success']) && ($result && isset($result['errors'][0]['message']))) {
+                        echo json_encode(["success" => "false","error" => ('Server error. '.$result['errors'][0]['message'])]);
+                        exit();
+                    } else if(!($result && isset($result['success']) && $result['success']) && !($result && isset($result['errors'][0]['message']))) {
+                        echo json_encode(["success" => "false","error" => ('Server error. Unknown error occurred.')]);
+                        exit();
+                    }
+
+                    // Remove from p80 conf
+                    if(!file_exists(dirname(__FILE__) . '/p80.conf')){
+                        echo json_encode([
+                            "success" => "false",
+                            "error" => "Server error. Domain successfully removed from cloudflare however missing p80.conf file preventing from removing the possible proxy config."
+                        ]);
+                        exit();
+                    }
+
+                    file_put_contents(dirname(__FILE__) . '/p80.conf', removeLastNewline(remove_section_between_markers(file_get_contents(dirname(__FILE__) . '/p80.conf'), '# START - '.$domain['name'], '# END - '.$domain['name'])));
+                    exec('sudo /usr/sbin/nginx -s reload');
+                }
+            }
+            // Get the new data again (it may have been updated)
+            if(!file_exists(dirname(__FILE__) . '/config.json')){
                 echo json_encode([
                     "success" => "false",
-                    "error" => "unauthorised"
+                    "error" => "Server error. No config file found."
                 ]);
                 exit();
+            }
+            if(!$data = json_decode(file_get_contents(dirname(__FILE__) . '/config.json'), true) ?: null){
+                echo json_encode([
+                    "success" => "false",
+                    "error" => "Server error. Invalid config file."
+                ]);
+                exit();
+            }
+            $newData = $data;
+            $newData['domains'] = [];
+
+            // Check again as the file may have changed
+            foreach ($data['domains'] as $domain) {
+                // Validation
+                if(
+                    !isset($domain['name']) ||
+                    !isset($domain['server']) ||
+                    !isset($domain['proxied']) ||
+                    !isset($domain['notes'])
+                ){
+                    echo json_encode([
+                        "success" => "false",
+                        "error" => "Server error. Invalid config file."
+                    ]);
+                    exit();
+                }
+                if ($domain['server'] === $specific_server && $domain['name'] == $domainName) {
+                    unset($domain);
+                }
+                if(isset($domain)){
+                    array_push($newData['domains'], $domain);
+                }
             }
             
             // Modify the 'config.json' file
@@ -358,6 +515,12 @@ if(isset(explode('/', $currentUrl)[3])){
             echo json_encode([
                 "success" => "true"
             ]);
+        } else{
+            echo json_encode([
+                "success" => "false",
+                "error" => "No specified server and or name."
+            ]);
+            exit();
         }
     }
     if(explode('/', $currentUrl)[3] == 'create'){
@@ -585,7 +748,7 @@ if(isset(explode('/', $currentUrl)[3])){
             } else {
                 echo json_encode([
                     "success" => "false",
-                    "error" => "unauthorised"
+                    "error" => "Unauthorised"
                 ]);
                 exit();
             }
@@ -696,12 +859,64 @@ function remove_section_between_markers($text, $start_marker, $end_marker) {
 function removeLastNewline($string) {
     return substr($string, -1) === "\n" ? rtrim($string, "\n") : $string;
 }
+function validateConfig($config){
+    if(!isset($config['domains'])){
+        echo json_encode([
+            "success" => "false",
+            "error" => "Invalid request. Config file missing domains section."
+        ]);
+        exit();
+    }
+    if(!isset($config['domains'][0])){
+        echo json_encode([
+            "success" => "false",
+            "error" => "Invalid request. Config file missing domains section."
+        ]);
+        exit();
+    }
+    if(!isset($config['domains'][0]['name'])){
+        echo json_encode([
+            "success" => "false",
+            "error" => "Invalid request. Domain missing name."
+        ]);
+        exit();
+    }
+    if(!isset($config['domains'][0]['server'])){
+        echo json_encode([
+            "success" => "false",
+            "error" => "Invalid request. Domain missing server."
+        ]);
+        exit();
+    }
+    if(!isset($config['domains'][0]['proxied'])){
+        echo json_encode([
+            "success" => "false",
+            "error" => "Invalid request. Domain missing proxied."
+        ]);
+        exit();
+    }
+    if(!isset($config['domains'][0]['notes'])){
+        echo json_encode([
+            "success" => "false",
+            "error" => "Invalid request. Domain missing notes."
+        ]);
+        exit();
+    }
+    if(isset($config['domains'][1])){
+        echo json_encode([
+            "success" => "false",
+            "error" => "Only one config aloud to update at a time."
+        ]);
+        exit();
+    }
+}
 
 /*
     Sorting out status
-    Doing - updateConfig
+    Doing - create
     Done (
         -   getsubdomains
+        -   updateConfig
+        -   remove
     )
 */
-// Need to finish off updateConfig (don't get fooled, it is un fishied) but also need to start to validate things like $domain['name'] for example, actually exists.
