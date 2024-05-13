@@ -6,6 +6,7 @@
 // if ($contents !== false) {
 //     $latestVersion = substr_replace($contents ,"", -1);
 // }
+
 $latestVersion = 'v1.0.0-pre';
 $version = 'v1.0.0-pre';
 
@@ -41,7 +42,7 @@ if (!isset($_GET['get']) && $_SERVER['REQUEST_URI'] != '/sanctum/csrf-cookie' &&
 ){
 
     // On the admin page
-    if(explode('/', $currentUrl)[1] == 'admin'){
+    /*if(explode('/', $currentUrl)[1] == 'admin'){
         echo "<script>const onAdminPage = true</script>";
         echo "<script>const addonVersion = '{$config['version']}'</script>";
         echo "<script>const upToDate = {$config['upToDate']}</script>";
@@ -82,7 +83,7 @@ if (!isset($_GET['get']) && $_SERVER['REQUEST_URI'] != '/sanctum/csrf-cookie' &&
             }
             exit();
         }
-    }
+    }*/
 }
 
 // Enable the plugins
@@ -100,4 +101,29 @@ foreach ($settings['plugins'] as $plugin) {
 if(explode('/', $currentUrl)[1] == 'pluginapi'){
     include(dirname(__FILE__) . '/pluginAPIManagement.php');
     exit();
+}
+
+$tabs = [
+    "name"=> "/testing"
+];
+
+function pluginManager($website){
+    $dom = new DOMDocument();
+    @$dom->loadHTML($website);
+    $xpath = new DOMXPath($dom);
+    $sidebarMenuElements = $xpath->query('//ul[contains(@class, "sidebar-menu")]');
+
+    foreach ($sidebarMenuElements as $sidebarMenuElement) {
+        // Remove all child nodes (HTML content) of the sidebar-menu element
+        while ($sidebarMenuElement->hasChildNodes()) {
+            $sidebarMenuElement->removeChild($sidebarMenuElement->firstChild);
+        }
+    }
+
+    // print_r($sidebarMenuElements);
+
+    $website = $dom->saveHTML();
+
+    // Display the HTML
+    echo $website;
 }
