@@ -23,5 +23,5 @@ $response->send();
 
 With
 ```php
-pluginManager($response->getContent());
+pluginManager($response);
 ```

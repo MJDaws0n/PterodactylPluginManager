@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>{{COMPANY_NAME}} - Settings</title>
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+        <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
+        <link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+        <link rel="manifest" href="/favicons/manifest.json">
+        <link rel="mask-icon" href="/favicons/safari-pinned-tab.svg" color="#bc6e3c">
+        <link rel="shortcut icon" href="/favicons/favicon.ico">
+        <meta name="msapplication-config" content="/favicons/browserconfig.xml">
+        <meta name="theme-color" content="#0e4688">
+        <link media="all" type="text/css" rel="stylesheet" href="/themes/pterodactyl/vendor/select2/select2.min.css?t=%7Bcache-version%7D">
+        <link media="all" type="text/css" rel="stylesheet" href="/themes/pterodactyl/vendor/bootstrap/bootstrap.min.css?t=%7Bcache-version%7D">
+        <link media="all" type="text/css" rel="stylesheet" href="/themes/pterodactyl/vendor/adminlte/admin.min.css?t=%7Bcache-version%7D">
+        <link media="all" type="text/css" rel="stylesheet" href="/themes/pterodactyl/vendor/adminlte/colors/skin-blue.min.css?t=%7Bcache-version%7D">
+        <link media="all" type="text/css" rel="stylesheet" href="/themes/pterodactyl/vendor/sweetalert/sweetalert.min.css?t=%7Bcache-version%7D">
+        <link media="all" type="text/css" rel="stylesheet" href="/themes/pterodactyl/vendor/animate/animate.min.css?t=%7Bcache-version%7D">
+        <link media="all" type="text/css" rel="stylesheet" href="/themes/pterodactyl/css/pterodactyl.css?t=%7Bcache-version%7D">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body class="hold-transition skin-blue fixed sidebar-mini">
+        <div class="wrapper">
+            <header class="main-header">
+                <a href="{{APP_URL}}" class="logo">
+                    <span>{{COMPANY_NAME}}</span>
+                </a>
+                <nav class="navbar navbar-static-top">
+                    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="user-menu">
+                                <a href="{{APP_URL}}/account">
+                                    <img src="{{GRAVATAR_URL}}" class="user-image" alt="User Image">
+                                    <span class="hidden-xs">{{USER_NAME}}</span>
+                                </a>
+                            </li>
+                            <li>
+                                </li><li><a href="{{APP_URL}}" data-toggle="tooltip" data-placement="bottom" title="Exit Admin Control"><i class="fa fa-server"></i></a></li>
+                            
+                            <li>
+                                </li><li><a href="{{APP_URL}}/auth/logout" id="logoutButton" data-toggle="tooltip" data-placement="bottom" title="Logout"><i class="fa fa-sign-out"></i></a></li>
+                            
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+            <aside class="main-sidebar">
+                <section class="sidebar">
+                    <ul class="sidebar-menu">
+                        <li class="header">BASIC ADMINISTRATION</li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin">
+                                <i class="fa fa-home"></i> <span>Overview</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin/settings">
+                                <i class="fa fa-wrench"></i> <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin/api">
+                                <i class="fa fa-gamepad"></i> <span>Application API</span>
+                            </a>
+                        </li>
+                        <li class="header">MANAGEMENT</li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin/databases">
+                                <i class="fa fa-database"></i> <span>Databases</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin/locations">
+                                <i class="fa fa-globe"></i> <span>Locations</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin/nodes">
+                                <i class="fa fa-sitemap"></i> <span>Nodes</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin/servers">
+                                <i class="fa fa-server"></i> <span>Servers</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin/users">
+                                <i class="fa fa-users"></i> <span>Users</span>
+                            </a>
+                        </li>
+                        <li class="header">SERVICE MANAGEMENT</li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin/mounts">
+                                <i class="fa fa-magic"></i> <span>Mounts</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="{{APP_URL}}/admin/nests">
+                                <i class="fa fa-th-large"></i> <span>Nests</span>
+                            </a>
+                        </li>
+                </section>
+            </aside>
+            <div class="content-wrapper">
+                <section class="content-header">
+                    <h1>Addon Settings<small>Actually Configure Pterodactyl to your liking.</small></h1>
+<ol class="breadcrumb">
+    <li><a href="{{APP_URL}}/admin">Admin</a></li>
+    <li class="active">Addon Settings</li>
+</ol>
+            </section>
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+                                                                            </div>
+                </div>
+                                <div class="row">
+    <div class="col-xs-12">
+        <div class="nav-tabs-custom nav-tabs-floating">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="{{APP_URL}}/admin/addonSettings">General</a></li>
+                
+                <li><a href="{{APP_URL}}/admin/addonSettings/advanced">Advanced</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Panel Settings</h3>
+            </div>
+            <form action="{{APP_URL}}/admin/addonSettings" method="POST">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label class="control-label">Copyright HTML</label>
+                            <div>
+                                <input type="text" class="form-control" name="addon:copyright" value="{{COPYRIGHT}}" control-id="ControlID-1">
+                                <p class="text-muted"><small>This is the copyright HTML that is used throughout the panel including emails sent to clients. Use Shift + F5 on anypages to see the updated text.</small>
+                            </p></div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="submit" name="_method" value="PATCH" class="btn btn-sm btn-primary pull-right" control-id="ControlID-5">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+            </section>
+            </div>
+            <footer class="main-footer">
+                <div class="pull-right small text-gray" style="margin-right:10px;margin-top:-7px;">
+                    <strong><i class="fa fa-fw fa-code-fork"></i></strong> 1.11.5<br>
+                    <strong><i class="fa fa-fw fa-clock-o"></i></strong> 0.021s
+                </div>
+                Copyright &copy; 2015 - 2024 <a href="https://pterodactyl.io/">Pterodactyl Software</a>.
+            </footer>
+        </div>
+                    <script src="/js/keyboard.polyfill.js" type="application/javascript"></script>
+            <script>keyboardeventKeyPolyfill.polyfill();</script>
+
+            <script src="/themes/pterodactyl/vendor/jquery/jquery.min.js?t=%7Bcache-version%7D"></script>
+
+            <script src="/themes/pterodactyl/vendor/sweetalert/sweetalert.min.js?t=%7Bcache-version%7D"></script>
+
+            <script src="/themes/pterodactyl/vendor/bootstrap/bootstrap.min.js?t=%7Bcache-version%7D"></script>
+
+            <script src="/themes/pterodactyl/vendor/slimscroll/jquery.slimscroll.min.js?t=%7Bcache-version%7D"></script>
+
+            <script src="/themes/pterodactyl/vendor/adminlte/app.min.js?t=%7Bcache-version%7D"></script>
+
+            <script src="/themes/pterodactyl/vendor/bootstrap-notify/bootstrap-notify.min.js?t=%7Bcache-version%7D"></script>
+
+            <script src="/themes/pterodactyl/vendor/select2/select2.full.min.js?t=%7Bcache-version%7D"></script>
+
+            <script src="/themes/pterodactyl/js/admin/functions.js?t=%7Bcache-version%7D"></script>
+
+            <script src="/js/autocomplete.js" type="application/javascript"></script>
+
+                            <script>
+                    $('#logoutButton').on('click', function (event) {
+                        event.preventDefault();
+
+                        var that = this;
+                        swal({
+                            title: 'Do you want to log out?',
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d9534f',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Log out'
+                        }, function () {
+                             $.ajax({
+                                type: 'POST',
+                                url: '{{APP_URL}}/auth/logout',
+                                data: {
+                                    _token: '{{CRSF_TOKEN}}'
+                                },complete: function () {
+                                    window.location.href = '{{APP_URL}}/auth/login';
+                                }
+                        });
+                    });
+                });
+                </script>
+            
+            <script>
+                $(function () {
+                    $('[data-toggle="tooltip"]').tooltip();
+                })
+            </script>
+            </body>
+</html>
