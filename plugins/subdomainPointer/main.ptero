@@ -2,7 +2,6 @@
     "name": "Subdomain Linker",
     "description": "Allows you to link a subdomain to a server using a CNAME record and cloudflares API.",
     "author": "MJDawson",
-    "url": "https://mjdawson.net",
     "last_updated": "07/05/2023",
     "execute": "/main.php"
 }

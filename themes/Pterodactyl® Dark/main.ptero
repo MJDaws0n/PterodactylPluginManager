@@ -1,0 +1,13 @@
+{
+  "name": "Pterodactyl® Dark",
+  "description": "The original Pterodactyl® Theme, but darker.",
+  "author": "MJDawson and Pterodactyl®",
+  "url": "https://mjdawson.net",
+  "template_default": true,
+  "load_js":[
+    "./all.js"
+  ],
+  "load_css":[
+    "./all.css"
+  ]
+}
