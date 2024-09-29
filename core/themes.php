@@ -72,6 +72,7 @@ class ThemesManager{
         }
         return false;
     }
+
     public function load(){
         // Get the current theme
         $themeName = $this->getTheme();
@@ -144,8 +145,6 @@ class ThemesManager{
     }
     public function getTheme(){
         //  Get the current theme
-
-        // Check it's not already been loaded in
         require_once dirname(__FILE__) . '/config.php';
 
         // Get the config
@@ -153,6 +152,24 @@ class ThemesManager{
         $settings = $config->getSettings();
 
         return $settings['theme'];
+    }
+    public function setTheme($themeName){
+        // Set the theme
+        require_once dirname(__FILE__) . '/config.php';
+
+        // Get the config
+        $config = new Config;
+        $settings = $config->getSettings();
+
+        foreach ($this->getThemes() as $theme) {
+            if ($theme['name'] === $themeName) {
+                $settings['theme'] = $themeName;
+                echo "Updated theme";
+                break;
+            }
+        }
+        
+        $config->updateSettings($settings);
     }
     public function getThemeByName($name){
         if(file_exists(dirname(__FILE__) . '/../themes/'.strval($name).'/main.ptero')){
@@ -167,5 +184,124 @@ class ThemesManager{
             return $theme;
         }
         return null;
+    }
+
+    public function upload($file) {
+        // Check if a file was uploaded
+        if (!isset($file)) {
+            return [1, 'Invalid file'];
+        }
+    
+        // Ensure it's a .zip file
+        $fileType = mime_content_type($file['tmp_name']);
+        if ($fileType !== 'application/zip') {
+            return [1, 'Invalid file type. Please upload a valid .zip theme.'];
+        }
+    
+        // Define the themes directory
+        $themeDir = dirname(__FILE__) . '/../themes/';
+        
+        // Create a temporary location for the uploaded zip file
+        $tempDir = sys_get_temp_dir() . '/' . basename($file['name']);
+        
+        // Move the uploaded file to the temp directory
+        if (!move_uploaded_file($file['tmp_name'], $tempDir)) {
+            return [1, "Failed to move the uploaded file."];
+        }
+    
+        // Open and extract the .zip file
+        $zip = new \ZipArchive();
+        if ($zip->open($tempDir) === TRUE) {
+            $extractPath = $themeDir . basename($file['name'], '.zip');
+    
+            // Check if the folder already exists
+            if (is_dir($extractPath)) {
+                $zip->close();
+                return [1, "Theme directory already exists."];
+            }
+    
+            // Extract the contents of the zip
+            $zip->extractTo($extractPath);
+            $zip->close();
+    
+            // Check for the presence of main.ptero file
+            $mainPtero = $extractPath . '/main.ptero';
+            if (!file_exists($mainPtero)) {
+                // Cleanup: remove the extracted folder
+                $this->removeDirectory($extractPath);
+                return [1, "Invalid theme. main.ptero not found."];
+            }
+    
+            // Validate the theme config
+            $themeConfig = json_decode(file_get_contents($mainPtero), true);
+            if (!$themeConfig || !$this->validateConfig($themeConfig)) {
+                echo "Invalid theme configuration.";
+                // Cleanup: remove the extracted folder
+                $this->removeDirectory($extractPath);
+                return [1, "Invalid theme. main.ptero not found."];
+            }
+    
+            // Change ownership and permissions of the extracted directory
+            chown($extractPath, 'www-data');  // Change ownership to www-data
+            chmod($extractPath, 0755);        // Set permissions to 755
+        } else {
+            unlink($tempDir);
+            return [1, "Failed to open the zip file."];
+        }
+    
+        // Remove the temporary zip file
+        unlink($tempDir);
+        return [0, 'Good'];
+    }
+    
+    private function removeDirectory($path) {
+        if (is_dir($path)) {
+            $files = scandir($path);
+            foreach ($files as $file) {
+                if ($file !== '.' && $file !== '..') {
+                    if (is_dir($path . '/' . $file)) {
+                        $this->removeDirectory($path . '/' . $file);
+                    } else {
+                        unlink($path . '/' . $file);
+                    }
+                }
+            }
+            rmdir($path);
+        }
+    }
+    public function delete($themeName){
+        // Theme folder path
+        $themeDir = dirname(__FILE__) . '/../themes/' . $themeName;
+
+        // Ensure the themes folder exists
+        if (is_dir($themeDir)) {
+            // Delete the entire theme folder and its contents
+            function deleteDirectory($dir) {
+                // show php errors
+                if (!is_dir($dir)) return;
+                $items = scandir($dir);
+    
+                foreach ($items as $item) {
+                    if ($item == '.' || $item == '..') continue;
+    
+                    $itemPath = $dir . '/' . $item;
+                    
+                    if (is_dir($itemPath)) {
+                        deleteDirectory($itemPath); // Recursively delete subdirectories
+                    } else {
+                        unlink($itemPath); // Delete files
+                    }
+                }
+    
+                rmdir($dir); // Finally, remove the directory itself
+            }
+    
+            // Perform deletion
+            deleteDirectory($themeDir);
+    
+            echo "Theme '$themeName' has been successfully deleted.";
+        } else {
+            echo "Theme '$themeName' not found.";
+        }
     }
 }

@@ -173,7 +173,7 @@ class PluginsManager{
         }
     }
     public function delete($pluginName){
-        // Plugin folder path (modify to fit your directory structure)
+        // Plugin folder path
         $pluginDir = dirname(__FILE__) . '/../plugins/' . $pluginName;
         
         // Ensure the plugin folder exists
@@ -193,7 +193,6 @@ class PluginsManager{
                         unlink($itemPath); // Delete files
                     }
                 }
-    
                 rmdir($dir); // Finally, remove the directory itself
             }
     

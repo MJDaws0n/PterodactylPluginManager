@@ -133,7 +133,7 @@ class Admin{
                     exit();
                 }
                 if(isset($_FILES['addon:plugin_upload'])){
-                    // Uplaod the plugin
+                    // Upload the plugin
                     require_once(dirname(__FILE__) . '/plugins.php');
                     $pluginManager = new PluginsManager;
 
@@ -142,7 +142,7 @@ class Admin{
                     exit();
                 }
                 if(isset($_POST['addon:plugin_delete'])){
-                    // Uplaod the plugin
+                    // Delete the plugin
                     require_once(dirname(__FILE__) . '/plugins.php');
                     $pluginManager = new PluginsManager;
 
@@ -190,6 +190,37 @@ class Admin{
                     $settings->updateSettings($addonSettings);
                     
                     // Redirect back to the addonsettings page with the GET page
+                    header('location: /admin/addonSettings/themes');
+                    exit();
+                }
+                if(isset($_FILES['addon:theme_upload'])){
+                    // Upload the theme
+                    require_once(dirname(__FILE__) . '/themes.php');
+                    $themeManager = new ThemesManager;
+
+                    $themeManager->upload($_FILES['addon:theme_upload']);
+                    header('location: /admin/addonSettings/themes');
+                    exit();
+                }
+                if(isset($_POST['addon:theme_delete'])){
+                    // Check it's not the default theme
+                    if($_POST['addon:theme_delete'] == 'Pterodactyl®'){
+                        echo "Stop messing with the requests 😡! You cannot delete the default Pterodactyl theme!";
+                        exit();
+                    }
+
+                    // Delete the theme
+                    require_once(dirname(__FILE__) . '/themes.php');
+                    $themeManager = new ThemesManager;
+
+                    // Check removed theme was not the active one
+                    if($themeManager->getTheme() == $_POST['addon:theme_delete']){
+                        // Activate the default pterodactyl theme
+                        $themeManager->setTheme('Pterodactyl®');
+                    }
+
+                    $themeManager->delete($_POST['addon:theme_delete']);
+
                     header('location: /admin/addonSettings/themes');
                     exit();
                 }
@@ -307,7 +338,7 @@ class Admin{
                                 '.$enable_disableButton.'
                             </td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-danger pull-left muted muted-hover" onclick="addon.delete(event)" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>
+                                <button class="btn btn-sm btn-danger pull-left muted muted-hover" onclick="addon.delete(event)" data-plugin-name="'.$plugin['name'].'" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>
                             </td>
                             </tr>
                             ';
@@ -331,7 +362,6 @@ class Admin{
                         if($tabElement->item(0) !== null){
                             // Set to active
                             $tabElement->item(0)->parentNode->setAttribute('class', 'active');
-                            
                         }
 
                         // Re-generate the HTML
@@ -388,6 +418,12 @@ class Admin{
                                 $author = '<a target="_blank" href="'.htmlspecialchars($theme['url']).'">'.$theme['author'].'</a>';
                             }
 
+                            $deleteButton = '<button class="btn btn-sm btn-danger pull-left muted muted-hover" data-theme-name="'.$theme['name'].'" onclick="addon.delete(event)" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>';
+
+                            if($theme['name'] == 'Pterodactyl®'){
+                                $deleteButton = '';
+                            }
+
                             // Add to the theme string
                             $themeString .= '
                             <tr>
@@ -404,7 +440,7 @@ class Admin{
                                 '.$enable_disableButton.'
                             </td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-danger pull-left muted muted-hover" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>
+                                '.$deleteButton.'
                             </td>
                             </tr>
                             ';
@@ -428,7 +464,6 @@ class Admin{
                         if($tabElement->item(0) !== null){
                             // Set to active
                             $tabElement->item(0)->parentNode->setAttribute('class', 'active');
-                            
                         }
 
                         // Re-generate the HTML
