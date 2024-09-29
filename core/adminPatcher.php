@@ -134,7 +134,7 @@ class AdminPatcher{
             $contents = file_get_contents($cacheFile);
         } else {
             // Fetch from URL and update cache
-            $url = 'https://github.com/MJDaws0n/PterodactylPluginManager/releases/download/latest/default.version';
+            $url = 'https://github.com/MJDaws0n/PterodactylPluginManager/releases/latest/download/default.version';
             $contents = @file_get_contents($url);
             
             // Check if fetching was successful
