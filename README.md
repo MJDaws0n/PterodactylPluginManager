@@ -23,7 +23,7 @@ $response->send();
 
 With
 ```php
-pluginManager($response);
+$addon = new Net\MJDawson\AddonManager\Connector($response);
 ```
 
 Finally update file permissions to fix any possible errors when creating files
