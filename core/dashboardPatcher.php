@@ -3,24 +3,9 @@ namespace Net\MJDawson\AddonManager\Core;
 
 class Patcher {
     private $errorLisnters = [];
-    private $patchString = 'bundlePatches';
-    private $nameString = 'bundle';
+    private $patchString = 'dashboardPatcher';
+    private $nameString = 'dashboard';
 
-    public function patch($xpath, $dom, $uri) {
-        // Only patch for GET requests to specific URIs
-        if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && ($uri[0] == '' || $uri[0] == 'server' || $uri[0] == 'account' || ($uri[0] == 'auth' && $uri[1] == 'login'))) {
-            $bundleScript = $xpath->query("//script[starts-with(@src, '/assets/bundle')]");
-
-            // Get the TPCC
-            require_once dirname(__FILE__).'/variables.php';
-            $cacheVer = '{{TPCC}}';
-
-            $variables = new Variables;
-            $variables->TPCC($cacheVer);
-
-            $bundleScript->item(0)->setAttribute('src', '/addon/scripts/bundle.js?v='.$cacheVer);
-        }
-    }
     public function load($pluginInstances) {
         $dir = dirname(__FILE__) . '/../../public/assets/';
         $files = glob($dir . $this->nameString.'*.js');
@@ -64,8 +49,7 @@ class Patcher {
         $patches = glob($patchDir . '*', GLOB_ONLYDIR);
 
         foreach ($patches as $patch) {
-            if (basename($patch) === 'append') continue; // Skip append folder
-            if (basename($patch) === 'topAppend') continue; // Skip topAppend folder
+            if (basename($patch) === 'append') continue; // Skip "append" folder
 
             $needlePath = $patch . '/needle.js';
             $haystackPath = $patch . '/haystack.js';
@@ -93,13 +77,6 @@ class Patcher {
         if (file_exists($appendPath)) {
             $append = file_get_contents($appendPath);
             $content .= $append;
-        } else {
-            $this->error(500, 'Missing Patch: append/pages.js');
-        }
-        $appendPath = dirname(__FILE__) . '/'.$this->patchString.'/topAppend/pages.js';
-        if (file_exists($appendPath)) {
-            $append = file_get_contents($appendPath);
-            $content = $append . $content;
         } else {
             $this->error(500, 'Missing Patch: append/pages.js');
         }

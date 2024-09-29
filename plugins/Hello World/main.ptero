@@ -1,0 +1,9 @@
+{
+    "name": "Hello World",
+    "description": "An example plugin that just shows the basics of the Pterodactyl® addon API",
+    "author": "MJDawson",
+    "url": "https://mjdawson.net",
+    "last_updated": "21/09/2024",
+    "entry": "./main.php",
+    "version": "1.0"
+}

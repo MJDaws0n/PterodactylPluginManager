@@ -3,10 +3,18 @@ namespace Net\MJDawson\AddonManager\Core;
 use Net\MJDawson\AddonManager\Core\BundlePatcher;
 
 class htmlParse {
-    private $errorLisnters = [];
+    private $errorListners = [];
     private $editListners = [];
     private $tabs = [];
 
+    public function __construct($pluginInstances) {
+        // Convert plugin instances HTML listners to htmlParse HTML listners
+        foreach ($pluginInstances as $instance) {
+            foreach ($instance->listAllHTMLListners() as $listner) {
+                $this->addHtmlListner($listner['function'], $listner['priority']);
+            }
+        }
+    }
     public function parse($content, $status, $uri){    
         // Fix PHP being stupid and adding unwanted tags using an incredibly insane method
         $content = str_replace(array('<p>', '</p>'), array(
@@ -26,15 +34,19 @@ class htmlParse {
         // Make changes
         // Add the admin tabs
         if($uri[0] == 'admin'){
+            // Check the admin page is not 404 by checking for presence of the session token
+            if(!session()->token() && $_SERVER['REQUEST_METHOD'] !== 'POST'){
+                return [ 'html' => '', 'status' => '404'];
+            }
             // Run the admin script for admin pages
-            require(dirname(__FILE__).'/admin.php');
+            require_once(dirname(__FILE__).'/admin.php');
             $admin = new Admin($uri, $this->tabs);
             $admin->editAdmin($dom, $xpath, [$this, 'addHtmlListner']);
         }
 
         // Run the bundle patcher
-        require dirname(__FILE__).'/bundlePatcher.php';
-        $patcher = new BundlePatcher();
+        require_once dirname(__FILE__).'/bundlePatcher.php';
+        $patcher = new Patcher();
         $patcher->onError(function($err){
             $this->error(500, $err);
         });
@@ -57,7 +69,6 @@ class htmlParse {
         usort($this->editListners, function($a, $b) {
             return $b['priority'] - $a['priority']; // Sort by descending priority
         });
-        
         foreach ($this->editListners as $listener) {
             $listnerFunction = $listener['function']; // Extract the function
 
@@ -82,10 +93,10 @@ class htmlParse {
         $this->editListners[] = ['function' => $function, 'priority' => $priority];
     }    
     public function onError($listner){
-        array_push($this->errorLisnters, $listner);
+        array_push($this->errorListners, $listner);
     }
     private function error($error){
-        foreach ($this->errorLisnters as $listner) {
+        foreach ($this->errorListners as $listner) {
             $listner($error);
         }
     }

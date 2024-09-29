@@ -4,5 +4,6 @@
     "author": "MJDawson",
     "url": "https://mjdawson.net",
     "last_updated": "06/05/2023",
-    "execute": "/main.php"
+    "entry": "./main.php",
+    "version": "1.0"
 }

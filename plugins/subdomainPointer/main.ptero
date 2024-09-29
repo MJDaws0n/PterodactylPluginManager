@@ -1,7 +1,7 @@
 {
     "name": "Subdomain Linker",
-    "description": "Allows you to link a subdomain to a server using a CNAME record and cloudflares API.",
+    "description": "Allows you to link a subdomain to a server using a CNAME record and cloudflares API. NOTE THIS PLUGIN DOES NOT WORK. DO NOT USE IT",
     "author": "MJDawson",
     "last_updated": "07/05/2023",
-    "execute": "/main.php"
+    "entry": "/main.php"
 }

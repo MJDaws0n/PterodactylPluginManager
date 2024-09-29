@@ -4,7 +4,11 @@ use Net\MJDawson\AddonManager\Core\htmlParse;
 
 class Init {
     private $errorLisnters = [];
+    private $pluginInstances;
 
+    public function __construct($pluginInstances) {
+        $this->pluginInstances = $pluginInstances;
+    }
     public function load($response, $uri){
         // Headers
         $headers = $response->headers->all();
@@ -21,9 +25,9 @@ class Init {
         }
 
         // Build the HTML
-        require dirname(__FILE__).'/htmlParse.php';
+        require_once dirname(__FILE__).'/htmlParse.php';
 
-        $website = new htmlParse();
+        $website = new htmlParse($this->pluginInstances);
         $website->onError(function($err){
             $this->error(500, $err);
         });
@@ -37,6 +41,14 @@ class Init {
         // Update the status
         $status = $site['status'];
         $statusText = Response::$statusTexts[$status] ?? '';
+
+        if($status == '404'){
+            if(file_exists(dirname(__FILE__).'/../pages/error404.html')){
+                $site['html'] = file_get_contents(dirname(__FILE__).'/../pages/error404.html');
+            } else{
+                $site['html'] = 'Error 404. Also someone deleted the error404.html page. Who could do such a thing!';
+            }
+        }
 
         // Combine 🤯
         header(sprintf('HTTP/%s %s %s', $response->getProtocolVersion(), $status, $statusText));
@@ -78,16 +90,16 @@ class Response{
         308 => 'Permanent Redirect',
         400 => 'Bad Request',
         401 => 'Unauthorized',
-        402 => 'Payment Required',
+        402 => 'Payment require_onced',
         403 => 'Forbidden',
         404 => 'Not Found',
         405 => 'Method Not Allowed',
         406 => 'Not Acceptable',
-        407 => 'Proxy Authentication Required',
+        407 => 'Proxy Authentication require_onced',
         408 => 'Request Timeout',
         409 => 'Conflict',
         410 => 'Gone',
-        411 => 'Length Required',
+        411 => 'Length require_onced',
         412 => 'Precondition Failed',
         413 => 'Payload Too Large',
         414 => 'URI Too Long',
@@ -100,8 +112,8 @@ class Response{
         423 => 'Locked',
         424 => 'Failed Dependency',
         425 => 'Too Early',
-        426 => 'Upgrade Required',
-        428 => 'Precondition Required',
+        426 => 'Upgrade require_onced',
+        428 => 'Precondition require_onced',
         429 => 'Too Many Requests',
         431 => 'Request Header Fields Too Large',
         451 => 'Unavailable For Legal Reasons',
@@ -115,6 +127,6 @@ class Response{
         507 => 'Insufficient Storage',
         508 => 'Loop Detected',
         510 => 'Not Extended',
-        511 => 'Network Authentication Required',
+        511 => 'Network Authentication require_onced',
     ];
 }

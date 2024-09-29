@@ -3,7 +3,9 @@
   "description": "The original Pterodactyl® Theme, but darker.",
   "author": "MJDawson and Pterodactyl®",
   "url": "https://mjdawson.net",
+  "last_updated": "21/09/2024",
   "template_default": true,
+  "version": "2.0",
   "load_js":[
     "./all.js"
   ],

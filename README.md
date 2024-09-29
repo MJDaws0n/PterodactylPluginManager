@@ -1,7 +1,5 @@
 #   PterdactylPluginManager
-Easily manage plugins a themes. Easily create your own plugins and themes using the custom API
-
-DOES NOT WORK PROPERLY YET DO USE
+Easily manage plugins and themes. Easily create your own plugins and themes using custom API
 
 #   Install
 Add this as a folder in ./pterodactyl/
@@ -26,8 +24,9 @@ $response->send();
 With
 ```php
 pluginManager($response);
-<<<<<<< HEAD
 ```
-=======
+
+Finally update file permissions to fix any possible errors when creating files
+```sh
+chmod -R 755 /var/www/pterodactyl/PterodactylPluginManager
 ```
->>>>>>> 216701fd809502736b5f43ddd5548a91ba9ac577

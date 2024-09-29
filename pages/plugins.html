@@ -26,6 +26,92 @@
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <script>
+      const addon = {
+        enable: function(e){
+          const theme = e.target.parentElement.parentElement.firstElementChild.firstElementChild.textContent;
+
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = window.location.href;
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = "addon:plugin";
+          setTimeout(function(){
+            input.value = theme;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+          }, 300);
+        },
+        upload: function(){
+          // Create a hidden file input
+          var fileInput = document.createElement('input');
+          fileInput.type = 'file';
+          fileInput.accept = '.zip'; // Only allow .zip files
+
+          // Trigger the file selection dialog
+          fileInput.click();
+
+          // When a file is selected
+          fileInput.onchange = function() {
+              var file = fileInput.files[0];
+
+              if (!file) {
+                  alert("No file selected.");
+                  return;
+              }
+
+              // Ensure it's a .zip file
+              if (file.type !== 'application/zip' && file.type !== 'application/x-zip-compressed') {
+                  alert("Please upload a valid .zip plugin.");
+                  return;
+              }
+
+              // Create a form dynamically
+              var form = document.createElement('form');
+              form.method = 'POST';
+              form.enctype = 'multipart/form-data';
+              setTimeout(function(){
+                form.action = '/admin/addonSettings/plugins';
+
+                // Append the file input to the form with the required name 'addon:plugin_upload'
+                fileInput.name = 'addon:plugin_upload'; // Assign the correct name
+                form.appendChild(fileInput);
+
+                // Append the form to the body and submit it
+                document.body.appendChild(form);
+
+                // Submit the form after appending everything
+                form.submit();
+              }, 300);
+          };
+        },
+        delete: function(e) {
+          const pluginName = e.target.parentElement.parentElement.firstElementChild.firstElementChild.textContent;
+
+          if (!confirm(`Are you sure you want to delete the plugin "${pluginName}"? This action cannot be undone.`)) {
+            return; // If the user cancels, exit the function
+          }
+
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = window.location.href;
+
+          // Add the hidden input field to send the plugin name
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = "addon:plugin_delete";
+          setTimeout(function(){
+            input.value = pluginName;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+          }, 300);
+        }
+      };
+    </script>
   </head>
   <body class="hold-transition skin-blue fixed sidebar-mini">
     <div class="wrapper">
@@ -154,7 +240,7 @@
                   <div class="box-header with-border">
                     <h3 class="box-title">Plugins</h3>
                     <div class="box-tools">
-                      <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#newLocationModal">Upload Plugin</button>
+                      <button class="btn btn-sm btn-primary" data-toggle="modal" id="uploadPluginBtn" onclick="addon.upload();">Upload Plugin</button>
                     </div>
                   </div>
                   <div class="box-body table-responsive no-padding">

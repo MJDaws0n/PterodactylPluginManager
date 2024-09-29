@@ -1,0 +1,1 @@
+viewBox:"9 9 ".concat(g," ")

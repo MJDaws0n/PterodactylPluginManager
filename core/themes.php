@@ -28,9 +28,7 @@ class ThemesManager{
                 $theme['active'] = false;
 
                 // Check it's not already been loaded in
-                if (!in_array(dirname(__FILE__) . '/config.php', get_included_files())){
-                    require dirname(__FILE__) . '/config.php';
-                }
+                require_once dirname(__FILE__) . '/config.php';
 
                 // Get the config
                 $config = new Config;
@@ -55,10 +53,11 @@ class ThemesManager{
         return $themes;
     }
     public function validateConfig($config){
-        // Themes config use the following (* for required):
+        // Themes config use the following (* for require_onced):
         // name*
         // description*
         // author*
+        // version*
         // url
         // last_updated
         // template_default
@@ -66,7 +65,8 @@ class ThemesManager{
         if(
             isset($config['name']) && is_string($config['name']) && 
             isset($config['description']) && is_string($config['description']) && 
-            isset($config['author']) && is_string($config['author'])
+            isset($config['author']) && is_string($config['author']) &&
+            isset($config['version']) && is_string($config['version'])
         ){
             return true;
         }
@@ -108,14 +108,32 @@ class ThemesManager{
                 // Check if the script is a url
                 if(str_starts_with($script, 'http://') || str_starts_with($script, 'https://')){
                     // Script is a URL, makes our life easy we just load that URL
-                    array_push($retTheme, $script);
+                    array_push($retTheme['scripts'], $script);
                 } else{
                     // Should just be a file, first check that it exists
                     if(file_exists(dirname(__FILE__) . '/../themes/'.$themeName.'/'.$script)){
                         // Give them out custom format
-                        array_push($retTheme, '/addon/scripts/'.$script);
+                        array_push($retTheme['scripts'], '/addon/scripts/theme/'.$script);
                     } else{
                         echo "Error: theme trying to load non-existent script";
+                        exit();
+                    }
+                }
+            }
+        }
+        if(isset($theme['load_css'])){
+            foreach($theme['load_css'] as $style){
+                // Check if the style is a url
+                if(str_starts_with($style, 'http://') || str_starts_with($style, 'https://')){
+                    // Style is a URL, makes our life easy we just load that URL
+                    array_push($retTheme['styles'], $style);
+                } else{
+                    // Should just be a file, first check that it exists
+                    if(file_exists(dirname(__FILE__) . '/../themes/'.$themeName.'/'.$style)){
+                        // Give them out custom format
+                        array_push($retTheme['styles'], '/addon/styles/theme/'.$style);
+                    } else{
+                        echo "Error: theme trying to load non-existent style";
                         exit();
                     }
                 }
@@ -128,14 +146,26 @@ class ThemesManager{
         //  Get the current theme
 
         // Check it's not already been loaded in
-        if (!in_array(dirname(__FILE__) . '/config.php', get_included_files())){
-            require dirname(__FILE__) . '/config.php';
-        }
+        require_once dirname(__FILE__) . '/config.php';
 
         // Get the config
         $config = new Config;
         $settings = $config->getSettings();
 
         return $settings['theme'];
+    }
+    public function getThemeByName($name){
+        if(file_exists(dirname(__FILE__) . '/../themes/'.strval($name).'/main.ptero')){
+            $theme = file_get_contents(dirname(__FILE__) . '/../themes/'.strval($name).'/main.ptero');
+            if(!$theme = json_decode($theme, true)){
+                return null;
+            }
+            if(!$this->validateConfig($theme)){
+                return null;
+            }
+
+            return $theme;
+        }
+        return null;
     }
 }

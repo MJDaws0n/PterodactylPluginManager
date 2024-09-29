@@ -4,5 +4,6 @@
   "author": "Pterodactyl®",
   "url": "https://pterodactyl.io",
   "template_default": true,
-  "last_updated": "28/09/2023"
+  "last_updated": "28/09/2023",
+  "version": "1.0"
 }

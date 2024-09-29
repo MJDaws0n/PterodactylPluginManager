@@ -69,7 +69,7 @@ class Admin{
             case('addonSettings'):{
                 if(isset($_POST['addon:copyright'])){
                     // Get the settings
-                    require(dirname(__FILE__).'/config.php');
+                    require_once dirname(__FILE__) . '/config.php';
                     $settings = new Config();
                     $addonSettings = $settings->getSettings();
 
@@ -86,20 +86,83 @@ class Admin{
                 break;
             }
             case('addonSettings/plugins'):{
-                // Needs implementing
+                if(isset($_POST['addon:plugin'])){
+                    // Get the settings
+                    require_once dirname(__FILE__) . '/config.php';
+                    $settings = new Config();
+                    $addonSettings = $settings->getSettings();
+
+                    $pluginName = $_POST['addon:plugin'];
+
+                    // Check the plugin exists and is valid
+                    require_once(dirname(__FILE__) . '/plugins.php');
+                    $pluginManager = new PluginsManager;
+
+                    // Check plugin folder exists
+                    if(!file_exists(dirname(__FILE__) . '/../plugins/'.$pluginName.'/main.ptero')){
+                        echo "Error invalid plugin";
+                        exit();
+                    }
+
+                    // Check plugin is valid JSON
+                    if(!$plugin = json_decode(file_get_contents(dirname(__FILE__) . '/../plugins/'.$pluginName.'/main.ptero'), true)){
+                        echo "Error invalid plugin";
+                        exit();
+                    }
+
+                    // Check the plugin config is valid
+                    if(!$pluginManager->validateConfig($plugin)){
+                        echo "Error invalid plugin";
+                        exit();
+                    }
+
+                    // Check if it's already active so we can decide what the toggle does
+                    if (in_array($pluginName, $addonSettings['plugins'])) {
+                        // If it's already active, deactivate it
+                        $addonSettings['plugins'] = array_diff($addonSettings['plugins'], [$pluginName]);
+                    } else {
+                        // If it's not active, activate it
+                        array_push($addonSettings['plugins'], $pluginName);
+                    }
+
+                    // Save changes
+                    $settings->updateSettings($addonSettings);
+                    
+                    // Redirect back to the plugins page with the GET page
+                    header('location: /admin/addonSettings/plugins');
+                    exit();
+                }
+                if(isset($_FILES['addon:plugin_upload'])){
+                    // Uplaod the plugin
+                    require_once(dirname(__FILE__) . '/plugins.php');
+                    $pluginManager = new PluginsManager;
+
+                    $pluginManager->upload($_FILES['addon:plugin_upload']);
+                    header('location: /admin/addonSettings/plugins');
+                    exit();
+                }
+                if(isset($_POST['addon:plugin_delete'])){
+                    // Uplaod the plugin
+                    require_once(dirname(__FILE__) . '/plugins.php');
+                    $pluginManager = new PluginsManager;
+
+                    $pluginManager->delete($_POST['addon:plugin_delete']);
+                    header('location: /admin/addonSettings/plugins');
+                    exit();
+                }
                 break;
             }
             case('addonSettings/themes'):{
                 if(isset($_POST['addon:theme'])){
                     // Get the settings
-                    require(dirname(__FILE__).'/config.php');
+                    require_once dirname(__FILE__) . '/config.php';
                     $settings = new Config();
                     $addonSettings = $settings->getSettings();
 
                     $themeName = $_POST['addon:theme'];
 
                     // Check the theme exists and is valid
-                    require(dirname(__FILE__) . '/themes.php');
+                    require_once(dirname(__FILE__) . '/themes.php');
                     $themeManager = new ThemesManager;
 
                     // Check theme folder exists
@@ -136,16 +199,16 @@ class Admin{
     }
     private function manageGet($dom, $xpath, $addHtmlListner){
         // Run the admin patcher
-        require dirname(__FILE__).'/adminPatcher.php';
+        require_once dirname(__FILE__).'/adminPatcher.php';
         $patcher = new AdminPatcher();
-        $patcher->patch($addHtmlListner);
+        $patcher->patch($addHtmlListner, $this->currentUri);
 
         switch($this->getPage()){
             case('addonSettings'):{
                 $addHtmlListner(function($HTML, $status){
                     if(file_exists(dirname(__FILE__).'/../pages/addonSettings.html')){
                         // We are not using $HTML becasue it is just most likley going to be a 404 page, so we might aswel just overide it
-                        require(dirname(__FILE__).'/config.php');
+                        require_once(dirname(__FILE__).'/config.php');
                         $settings = new Config();
                         $addonSettings = $settings->getSettings();
 
@@ -192,7 +255,7 @@ class Admin{
                 $addHtmlListner(function($HTML, $status){
                     if(file_exists(dirname(__FILE__).'/../pages/plugins.html')){
                         // We are not using $HTML becasue it is just most likley going to be a 404 page, so we might aswel just overide it
-                        require(dirname(__FILE__).'/config.php');
+                        require_once(dirname(__FILE__).'/config.php');
                         $settings = new Config();
                         $addonSettings = $settings->getSettings();
 
@@ -205,7 +268,7 @@ class Admin{
                         $site = str_replace('{{COPYRIGHT}}', htmlspecialchars(strval($addonSettings['copyright'])), $site);
 
                         // Display the plugins
-                        require(dirname(__FILE__).'/plugins.php');
+                        require_once(dirname(__FILE__).'/plugins.php');
                         $pluginsManager = new PluginsManager;
                         $plugins = $pluginsManager->getPlugins();
 
@@ -213,11 +276,11 @@ class Admin{
 
                         foreach ($plugins as $plugin) {
                             // Set the button to either active or not active
-                            $enable_disableButton = '<button class="btn btn-sm btn-primary pull-right" control-id="ControlID-8">Enable</button>';
+                            $enable_disableButton = '<button class="btn btn-sm btn-primary pull-right" onclick="addon.enable(event)" control-id="ControlID-8">Enable</button>';
 
                             if($plugin['active']){
                                 // Plugin is active
-                                $enable_disableButton = '<button class="btn btn-sm btn-primary pull-right" control-id="ControlID-8">Disable</button>';
+                                $enable_disableButton = '<button class="btn btn-sm btn-primary pull-right" onclick="addon.enable(event)" control-id="ControlID-8">Disable</button>';
                             }
 
                             // Set the plugins author section (we need to know if there is a URL)
@@ -244,7 +307,7 @@ class Admin{
                                 '.$enable_disableButton.'
                             </td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-danger pull-left muted muted-hover" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>
+                                <button class="btn btn-sm btn-danger pull-left muted muted-hover" onclick="addon.delete(event)" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>
                             </td>
                             </tr>
                             ';
@@ -289,7 +352,7 @@ class Admin{
                 $addHtmlListner(function($HTML, $status){
                     if(file_exists(dirname(__FILE__).'/../pages/themes.html')){
                         // We are not using $HTML becasue it is just most likley going to be a 404 page, so we might aswel just overide it
-                        require(dirname(__FILE__).'/config.php');
+                        require_once(dirname(__FILE__).'/config.php');
                         $settings = new Config();
                         $addonSettings = $settings->getSettings();
 
@@ -302,7 +365,7 @@ class Admin{
                         $site = str_replace('{{COPYRIGHT}}', htmlspecialchars(strval($addonSettings['copyright'])), $site);
 
                         // Display the themes
-                        require(dirname(__FILE__).'/themes.php');
+                        require_once(dirname(__FILE__).'/themes.php');
                         $themesManager = new ThemesManager;
                         $themes = $themesManager->getThemes();
 
