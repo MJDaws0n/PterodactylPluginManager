@@ -44,7 +44,11 @@ class PluginsAPI{
             || $currentUri[0] == '/'
             || $currentUri[0] == 'server'
             || $currentUri[0] == 'account') {
-            $ret['end'] = 'front';
+            if($this->getUser() !== null){
+                $ret['end'] = 'front';
+            } else{
+                $ret['end'] = 'login';
+            }
         }
     
         if ($currentUri[0] == 'admin') {
@@ -62,7 +66,10 @@ class PluginsAPI{
     public function listAllPatches() : array {
         return $this->patches;
     }
-    public function getUser() : object {
+    public function getUser() {
+        if((!auth()->check())){
+            return null;
+        }
         return auth()->user();
     }
     public function vendorDashPatch($needle, $haystack) : void {
