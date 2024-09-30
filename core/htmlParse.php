@@ -15,7 +15,7 @@ class htmlParse {
             }
         }
     }
-    public function parse($content, $status, $uri){    
+    public function parse($content, $status, $uri){   
         // Fix PHP being stupid and adding unwanted tags using an incredibly insane method
         $content = str_replace(array('<p>', '</p>'), array(
             '<phpStupid id="phpStupid" class="phpStupid" data-phpStupid="phpStupid">',
@@ -42,6 +42,11 @@ class htmlParse {
             require_once(dirname(__FILE__).'/admin.php');
             $admin = new Admin($uri, $this->tabs);
             $admin->editAdmin($dom, $xpath, [$this, 'addHtmlListner']);
+
+            if(!auth()->user() !== null){
+                // Not logged in so 404
+                return [ 'html' => '', 'status' => '404'];
+            }
         }
 
         // Run the bundle patcher
