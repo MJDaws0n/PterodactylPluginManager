@@ -244,11 +244,11 @@ class Admin{
                         $addonSettings = $settings->getSettings();
 
                         $site = file_get_contents(dirname(__FILE__).'/../pages/addonSettings.html');
-                        $site = str_replace('{{CRSF_TOKEN}}', strval(session()->token()), $site);
-                        $site = str_replace('{{APP_URL}}', strval($_ENV['APP_URL']), $site);
-                        $site = str_replace('{{GRAVATAR_URL}}', strval('https://www.gravatar.com/avatar/' . md5(trim(strtolower(auth()->user()['email']))) . '?s=160'), $site);
-                        $site = str_replace('{{USER_NAME}}', strval(auth()->user()['name_first'] . ' ' . auth()->user()['name_last']), $site);
-                        $site = str_replace('{{COMPANY_NAME}}', strval(config('app.name')), $site);
+                        $site = str_replace('{{CRSF_TOKEN}}', htmlspecialchars(strval(session()->token())), $site);
+                        $site = str_replace('{{APP_URL}}', htmlspecialchars(strval($_ENV['APP_URL'])), $site);
+                        $site = str_replace('{{GRAVATAR_URL}}', htmlspecialchars(strval('https://www.gravatar.com/avatar/' . md5(trim(strtolower(auth()->user()['email']))) . '?s=160')), $site);
+                        $site = str_replace('{{USER_NAME}}', htmlspecialchars((strval(auth()->user()['name_first'] . ' ' . auth()->user()['name_last']))), $site);
+                        $site = str_replace('{{COMPANY_NAME}}', htmlspecialchars((strval(config('app.name')))), $site);
                         $site = str_replace('{{COPYRIGHT}}', htmlspecialchars(strval($addonSettings['copyright'])), $site);
 
                         // Update the dom and xpath
@@ -291,11 +291,11 @@ class Admin{
                         $addonSettings = $settings->getSettings();
 
                         $site = file_get_contents(dirname(__FILE__).'/../pages/plugins.html');
-                        $site = str_replace('{{CRSF_TOKEN}}', strval(session()->token()), $site);
-                        $site = str_replace('{{APP_URL}}', strval($_ENV['APP_URL']), $site);
-                        $site = str_replace('{{GRAVATAR_URL}}', strval('https://www.gravatar.com/avatar/' . md5(trim(strtolower(auth()->user()['email']))) . '?s=160'), $site);
-                        $site = str_replace('{{USER_NAME}}', strval(auth()->user()['name_first'] . ' ' . auth()->user()['name_last']), $site);
-                        $site = str_replace('{{COMPANY_NAME}}', strval(config('app.name')), $site);
+                        $site = str_replace('{{CRSF_TOKEN}}', htmlspecialchars(strval(session()->token())), $site);
+                        $site = str_replace('{{APP_URL}}', htmlspecialchars(strval($_ENV['APP_URL'])), $site);
+                        $site = str_replace('{{GRAVATAR_URL}}', htmlspecialchars(strval('https://www.gravatar.com/avatar/' . md5(trim(strtolower(auth()->user()['email']))) . '?s=160')), $site);
+                        $site = str_replace('{{USER_NAME}}', htmlspecialchars(strval(auth()->user()['name_first'] . ' ' . auth()->user()['name_last'])), $site);
+                        $site = str_replace('{{COMPANY_NAME}}', htmlspecialchars(strval(config('app.name'))), $site);
                         $site = str_replace('{{COPYRIGHT}}', htmlspecialchars(strval($addonSettings['copyright'])), $site);
 
                         // Display the plugins
@@ -319,26 +319,26 @@ class Admin{
 
                             if(isset($plugin['url'])){
                                 // Plugin is active
-                                $author = '<a target="_blank" href="'.htmlspecialchars($plugin['url']).'">'.$plugin['author'].'</a>';
+                                $author = '<a target="_blank" href="'.htmlspecialchars($plugin['url']).'">'.htmlspecialchars($plugin['author']).'</a>';
                             }
 
                             // Add to the plugin string
                             $pluginString .= '
                             <tr>
                             <td>
-                                <p>'.$plugin['name'].'</p>
+                                <p>'.htmlspecialchars($plugin['name']).'</p>
                             </td>
                             <td>
                                 '.$author.'
                             </td>
                             <td>
-                                <p>'.$plugin['description'].'</p>
+                                <p>'.htmlspecialchars($plugin['description']).'</p>
                             </td>
                             <td class="text-center">
                                 '.$enable_disableButton.'
                             </td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-danger pull-left muted muted-hover" onclick="addon.delete(event)" data-plugin-name="'.$plugin['name'].'" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>
+                                <button class="btn btn-sm btn-danger pull-left muted muted-hover" onclick="addon.delete(event)" data-plugin-name="'.htmlspecialchars($plugin['name']).'" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>
                             </td>
                             </tr>
                             ';
@@ -387,11 +387,11 @@ class Admin{
                         $addonSettings = $settings->getSettings();
 
                         $site = file_get_contents(dirname(__FILE__).'/../pages/themes.html');
-                        $site = str_replace('{{CRSF_TOKEN}}', strval(session()->token()), $site);
-                        $site = str_replace('{{APP_URL}}', strval($_ENV['APP_URL']), $site);
-                        $site = str_replace('{{GRAVATAR_URL}}', strval('https://www.gravatar.com/avatar/' . md5(trim(strtolower(auth()->user()['email']))) . '?s=160'), $site);
-                        $site = str_replace('{{USER_NAME}}', strval(auth()->user()['name_first'] . ' ' . auth()->user()['name_last']), $site);
-                        $site = str_replace('{{COMPANY_NAME}}', strval(config('app.name')), $site);
+                        $site = str_replace('{{CRSF_TOKEN}}', htmlspecialchars(strval(session()->token())), $site);
+                        $site = str_replace('{{APP_URL}}', htmlspecialchars(strval($_ENV['APP_URL'])), $site);
+                        $site = str_replace('{{GRAVATAR_URL}}', htmlspecialchars(strval('https://www.gravatar.com/avatar/' . md5(trim(strtolower(auth()->user()['email']))) . '?s=160')), $site);
+                        $site = str_replace('{{USER_NAME}}', htmlspecialchars(strval(auth()->user()['name_first'] . ' ' . auth()->user()['name_last'])), $site);
+                        $site = str_replace('{{COMPANY_NAME}}', htmlspecialchars(strval(config('app.name'))), $site);
                         $site = str_replace('{{COPYRIGHT}}', htmlspecialchars(strval($addonSettings['copyright'])), $site);
 
                         // Display the themes
@@ -415,10 +415,10 @@ class Admin{
 
                             if(isset($theme['url'])){
                                 // Theme is active
-                                $author = '<a target="_blank" href="'.htmlspecialchars($theme['url']).'">'.$theme['author'].'</a>';
+                                $author = '<a target="_blank" href="'.htmlspecialchars($theme['url']).'">'.htmlspecialchars($theme['author']).'</a>';
                             }
 
-                            $deleteButton = '<button class="btn btn-sm btn-danger pull-left muted muted-hover" data-theme-name="'.$theme['name'].'" onclick="addon.delete(event)" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>';
+                            $deleteButton = '<button class="btn btn-sm btn-danger pull-left muted muted-hover" data-theme-name="'.htmlspecialchars($theme['name']).'" onclick="addon.delete(event)" control-id="ControlID-5"><i class="fa fa-trash-o"></i></button>';
 
                             if($theme['name'] == 'Pterodactyl®'){
                                 $deleteButton = '';
@@ -428,13 +428,13 @@ class Admin{
                             $themeString .= '
                             <tr>
                             <td>
-                                <p>'.$theme['name'].'</p>
+                                <p>'.htmlspecialchars($theme['name']).'</p>
                             </td>
                             <td>
                                 '.$author.'
                             </td>
                             <td>
-                                <p>'.$theme['description'].'</p>
+                                <p>'.htmlspecialchars($theme['description']).'</p>
                             </td>
                             <td class="text-center">
                                 '.$enable_disableButton.'

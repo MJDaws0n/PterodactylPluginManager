@@ -21,7 +21,7 @@ if($pterodactyl->getPage()['end'] == 'front'){
         $headerElement2->setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js');
 
         // Create the gravitar url from the email address
-        $gravitarURL = strval('https://www.gravatar.com/avatar/' . md5(trim(strtolower($pterodactyl->getUser()['email']))) . '?s=20');
+        $gravitarURL = htmlspecialchars(strval('https://www.gravatar.com/avatar/' . md5(trim(strtolower($pterodactyl->getUser()['email']))) . '?s=20'));
 
         // Add the JS that the patcher requires to use
         $script = $parser->dom()->createElement('script');
@@ -32,7 +32,7 @@ if($pterodactyl->getPage()['end'] == 'front'){
         // Add inner script content
         $script->appendChild($parser->dom()->createTextNode("
             const net_mjdawson_gravitarpfp = {
-                gravitarURL: '$gravitarURL'
+                gravitarURL: '".htmlspecialchars($gravitarURL)."'
             };
         "));
 
