@@ -246,9 +246,14 @@
       const input = document.createElement("input");
       input.type = "hidden";
       input.name = "addon:plugin";
+      const token = document.createElement("input")
+      token.type = "hidden";
+      token.name = "_token";
+      token.value = '{{CRSF_TOKEN}}';
       setTimeout(function(){
         input.value = theme;
         form.appendChild(input);
+        form.appendChild(token);
         document.body.appendChild(form);
         form.submit();
       }, 300);

@@ -65,6 +65,11 @@ class Admin{
         }
     }
     private function managePost($dom, $xpath, $addHtmlListner){
+        if(!auth()->check() || !auth()->user()['root_admin']){
+            header('HTTP/1.0 403 Forbidden');
+            echo "Forbidden";
+            exit();
+        }
         switch($this->getPage()){
             case('addonSettings'):{
                 if(isset($_POST['addon:copyright'])){

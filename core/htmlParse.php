@@ -43,7 +43,7 @@ class htmlParse {
             $admin = new Admin($uri, $this->tabs);
             $admin->editAdmin($dom, $xpath, [$this, 'addHtmlListner']);
 
-            if(!auth()->user() !== null){
+            if(!auth()->check()){
                 // Not logged in so 404
                 return [ 'html' => '', 'status' => '404'];
             }

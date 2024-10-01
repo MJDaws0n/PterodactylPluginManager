@@ -17,7 +17,10 @@ class Installer {
                 "Route::group(['prefix' => 'addonSettings'], function () {\n" .
                 "    Route::get('/');\n" .
                 "    Route::get('/plugins');\n" .
-                "    Route::get('/themes');\n" .
+                "    Route::get('/themes');\n\n" .
+                "    Route::post('/');\n".
+                "    Route::post('/plugins');\n".
+                "    Route::post('/themes');   \n".         
                 "});\n";
         // Check that admin is not already installed
         if (!is_file(dirname(__FILE__).'/../../routes/admin.php')) {
