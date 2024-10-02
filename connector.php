@@ -81,6 +81,9 @@ class Connector {
         if($this->get_uri_components()[0] == 'api'){
             return true;
         }
+        if($this->get_uri_components()[0] == 'admin' && $this->get_uri_components()[1] == 'users' && str_starts_with($this->get_uri_components()[2], 'accounts.json')){
+            return true;
+        }
 
         return false;
     }
